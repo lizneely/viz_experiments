@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>O'Keeffe's Subjects · O'Keeffe Experiments</title>
+    <!-- Written for p5.js 1.x. Keep this version; p5 2.x changed some functions it uses. -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+:root{--ground:#EEF0EE;--ink:#1D2226;--ink2:#4C555C;--ink3:#7C868D;--g:#A3302A}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;--ground:#15191B;--ink:#E6E9E8;--ink2:#B3BBBF;--ink3:#848E94;--g:#E8746A}}
+:root[data-theme="dark"]{color-scheme:dark;--ground:#15191B;--ink:#E6E9E8;--ink2:#B3BBBF;--ink3:#848E94;--g:#E8746A}
+body{background:var(--ground);color:var(--ink);font-family:"Public Sans",system-ui,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:32px 56px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+h1{font-family:"Newsreader",Georgia,serif;font-weight:500;font-size:clamp(30px,5vw,48px);line-height:1.05;margin:8px 0 10px;text-wrap:balance}
+h1 em{color:var(--g)}
+.lede{max-width:66ch;color:var(--ink2);margin:0 0 18px;font-size:15.5px;line-height:1.55}
+#stage{width:100%;touch-action:pan-y}
+#stage canvas{display:block}
+#card b{font-weight:500}
+.lab{background:var(--ink);color:var(--ground)}
+.lab-in{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:16px 15px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px}
+.lab-brand{display:flex;align-items:center;gap:10px;font-family:"Newsreader",Georgia,serif;font-size:22px;font-weight:500;line-height:1;white-space:nowrap}
+.lab-brand em{font-style:italic;font-weight:400}
+.lab-mark{width:14px;height:14px;border-radius:50%;border:1.5px solid currentColor;position:relative;flex:none}
+.lab-mark::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--g)}
+.lab-note{display:flex;align-items:center;gap:10px;font-size:13.5px;line-height:1.45;opacity:.92;max-width:72ch}
+.lab-pill{font:500 10.5px/1 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;border:1px solid currentColor;border-radius:999px;padding:4px 8px;white-space:nowrap;opacity:.85}
+</style>
+  </head>
+  <body>
+    <div class="lab" role="note" aria-label="About this prototype">
+  <div class="lab-in">
+    <div class="lab-brand"><span class="lab-mark" aria-hidden="true"></span>O'Keeffe Experiments</div>
+    <div class="lab-note"><span class="lab-pill">Prototype</span><span>The following prototype is for experimental purposes and is using information that has not been reviewed.</span></div>
+  </div>
+</div>
+<div class="wrap">
+  <div class="eyebrow">Georgia O'Keeffe Museum · Catalogue raisonné · p5.js</div>
+  <h1>O'Keeffe's Subjects</h1>
+  <p class="lede">O'Keeffe's artworks works grouped by what they show. Click a bubble to break it apart.</p>
+  <div id="stage"></div>
+</div>
+    <script src="sketch.js"></script>
+  </body>
+</html>
