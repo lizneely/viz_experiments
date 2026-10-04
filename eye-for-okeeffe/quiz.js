@@ -164,13 +164,13 @@ function explain(round) {
 
   if (round.truth === "alike") {
     const main = groups.alike.length ? groups.alike : groups.close;
-    let s = "The computer finds these composed alike. They match in " + listWords(main) + ".";
+    let s = "The computer finds these compositions similar. They match in " + listWords(main) + ".";
     if (groups.alike.length && groups.close.length) s += " They're also close in " + listWords(groups.close) + ".";
     return s;
   }
 
   let s = "The computer finds these composed differently. They differ in " + listWords(groups.different) + ".";
-  if (groups.alike.length) s += " They're alike only in " + listWords(groups.alike) + ".";
+  if (groups.alike.length) s += " They're similar only in " + listWords(groups.alike) + ".";
   return s;
 }
 
