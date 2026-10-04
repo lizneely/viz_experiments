@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eye for O'Keeffe</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="style.css" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.1/p5.min.js"></script>
+
+  <!-- Parse museum JSON (Jonathan's parser) -->
+  <script src="records.js"></script>
+  <!-- Composition analysis (Jonathan's analysis) -->
+  <script src="composition.js"></script>
+  <!-- Distances, alike/different judgments, descriptions (shared with Composed Alike) -->
+  <script src="compare.js"></script>
+  <!-- The quiz: rounds, answers, score -->
+  <script src="quiz.js"></script>
+  <!-- p5: reads the collection and draws each pair -->
+  <script src="sketch.js"></script>
+</head>
+
+<body>
+
+  <div class="lab" role="note" aria-label="About this prototype">
+    <div class="lab-in">
+      <div class="lab-brand"><span class="lab-mark" aria-hidden="true"></span>O'Keeffe Experiments</div>
+      <div class="lab-note"><span class="lab-pill">Prototype</span><span>The following prototype is for experimental purposes and is using information that has not been reviewed.</span></div>
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="top-in">
+      <div class="eyebrow">Georgia O'Keeffe Museum · Digital Experience</div>
+      <h1>Eye for O'Keeffe</h1>
+      <p class="lede">How well do you read an O'Keeffe? In five rounds, look at two of her works and decide whether they're composed alike. Then see how a computer reads them.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="panel game" aria-live="polite">
+
+      <div class="game-top">
+        <span id="round-label" class="eyebrow">Five rounds</span>
+        <ol id="dots" class="dots" aria-label="Your answers so far"></ol>
+      </div>
+
+      <!-- ===================== INTRO ===================== -->
+      <div id="screen-intro" class="screen intro-screen">
+        <h2 class="big">Do you see what the computer sees?</h2>
+        <ol class="steps">
+          <li><span class="step-n" aria-hidden="true">1</span><span><strong>Look at two works</strong> by Georgia O'Keeffe, side by side.</span></li>
+          <li><span class="step-n" aria-hidden="true">2</span><span><strong>Decide</strong> whether they're composed alike or composed differently.</span></li>
+          <li><span class="step-n" aria-hidden="true">3</span><span><strong>See how the computer reads them</strong>: where the eye lands, which way each work leans, and how the lines run.</span></li>
+        </ol>
+        <p class="aside-note">There's no wrong way to look. The computer measures only light, color, and edges, so it can miss things you notice.</p>
+        <div class="start-row">
+          <button id="start" class="btn btn-primary btn-big" type="button" disabled>Start</button>
+          <div id="ready" class="ready">
+            <div class="progress-bar" aria-hidden="true"><span id="ready-fill"></span></div>
+            <span id="ready-text" class="meta">Getting the works ready…</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== A ROUND ===================== -->
+      <div id="screen-play" class="screen" hidden>
+        <div id="canvas-container" class="stage"></div>
+
+        <div class="captions">
+          <p id="cap-a" class="cap"></p>
+          <p id="cap-b" class="cap"></p>
+        </div>
+
+        <div id="ask" class="ask">
+          <h2 class="question">Are these two composed alike?</h2>
+          <p class="hint">Look at where your eye lands first, which way each picture leans, and how the lines run.</p>
+          <div class="answers">
+            <button id="btn-alike" class="answer" type="button">
+              <svg viewBox="0 0 44 24" aria-hidden="true"><circle cx="14" cy="12" r="8" fill="none" stroke-width="2.2"/><circle cx="30" cy="12" r="8" fill="none" stroke-width="2.2"/></svg>
+              <span class="answer-word">Alike</span>
+            </button>
+            <button id="btn-different" class="answer" type="button">
+              <svg viewBox="0 0 44 24" aria-hidden="true"><circle cx="10" cy="8" r="6" fill="none" stroke-width="2.2"/><rect x="25" y="9" width="13" height="13" fill="none" stroke-width="2.2"/></svg>
+              <span class="answer-word">Different</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="reveal" class="reveal" hidden>
+          <div class="verdict">
+            <p id="verdict-head" class="verdict-head"></p>
+            <p id="verdict-body" class="verdict-body"></p>
+          </div>
+          <div class="reveal-body">
+            <figure class="overlay-fig">
+              <div id="overlay" class="overlay"></div>
+              <figcaption class="overlay-key">
+                <span><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="6.5" class="g-stroke" fill="none" stroke-width="2.5"/></svg> Left work</span>
+                <span><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="6.5" class="ink-stroke" fill="none" stroke-width="2" stroke-dasharray="3.5 2.5"/></svg> Right work</span>
+                <span class="meta">Both marks on one frame</span>
+              </figcaption>
+            </figure>
+            <div class="table-wrap">
+              <table id="reveal-table" class="compare-table"></table>
+            </div>
+          </div>
+          <div class="next-row">
+            <button id="next" class="btn btn-primary" type="button">Next pair</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== END ===================== -->
+      <div id="screen-end" class="screen end-screen" hidden>
+        <div class="score-block">
+          <div id="score-num" class="score-num"></div>
+          <div>
+            <h2 id="score-title" class="big"></h2>
+            <p id="score-text" class="score-text"></p>
+          </div>
+        </div>
+        <ol id="review" class="review"></ol>
+        <div class="end-actions">
+          <button id="again" class="btn btn-primary" type="button">Play again</button>
+        </div>
+        <details class="how">
+          <summary>How the computer reads composition</summary>
+          <div class="how-body">
+            <p>The computer shrinks each image to 150 pixels wide and measures contrast in brightness, color, and fine detail. From those measurements it estimates:</p>
+            <dl>
+              <dt>Where the eye lands</dt>
+              <dd>The spot where several kinds of contrast agree, marked with a ring.</dd>
+              <dt>Balance</dt>
+              <dd>The balance point of all the visual activity. The arrow runs from the middle of the frame toward it.</dd>
+              <dt>Lines</dt>
+              <dd>How much of the edge energy runs horizontally, vertically, or on a diagonal.</dd>
+              <dt>Symmetry</dt>
+              <dd>How closely the left half mirrors the right.</dd>
+              <dt>Amount of detail</dt>
+              <dd>How much of the picture is made of strong edges.</dd>
+            </dl>
+            <p>Each pair in the quiz is either among the closest matches in the collection or far apart on most of these points. The computer sees only light, color, and edges, not subject matter, so when you disagree with it, you may be noticing something it can't.</p>
+          </div>
+        </details>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p class="fine">O'Keeffe Experiments is a digital experience lab at the Georgia O'Keeffe Museum. This prototype uses collection data, including the catalogue raisonné, that has not been reviewed for publication. Images are provided through the Museum's IIIF image service.</p>
+  </footer>
+
+</body>
+</html>
