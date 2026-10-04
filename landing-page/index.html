@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O'Keeffe Experiments</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the lab banner, a short intro, a two-column grid of prototype cards, then one feedback panel. Same tokens as the prototypes. */
+:root{
+  --ground:#EEF0EE; --paper:#F8F9F7; --ink:#1D2226; --ink2:#4C555C; --ink3:#7C868D; --rule:#D5DAD8; --g:#A3302A; --g-ink:#FFFFFF;
+  --display:"Newsreader",Georgia,"Times New Roman",serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;--ground:#15191B;--paper:#1D2225;--ink:#E6E9E8;--ink2:#B3BBBF;--ink3:#848E94;--rule:#2E3539;--g:#E8746A;--g-ink:#15191B}}
+:root[data-theme="dark"]{color-scheme:dark;--ground:#15191B;--paper:#1D2225;--ink:#E6E9E8;--ink2:#B3BBBF;--ink3:#848E94;--rule:#2E3539;--g:#E8746A;--g-ink:#15191B}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--g);outline-offset:3px;border-radius:4px}
+
+.lab{background:var(--ink);color:var(--ground)}
+.lab-in{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:16px 15px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px}
+.lab-brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:22px;font-weight:500;line-height:1;white-space:nowrap}
+.lab-mark{width:14px;height:14px;border-radius:50%;border:1.5px solid currentColor;position:relative;flex:none}
+.lab-mark::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--g)}
+.lab-note{display:flex;align-items:center;gap:10px;font-size:13.5px;line-height:1.45;opacity:.92;max-width:72ch}
+.lab-pill{font:500 10.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;border:1px solid currentColor;border-radius:999px;padding:4px 8px;white-space:nowrap;opacity:.85}
+
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:40px 64px;display:grid;gap:44px}
+.eyebrow{font:500 12px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+.intro{display:grid;gap:12px;max-width:68ch}
+h1{font-family:var(--display);font-weight:500;font-size:clamp(36px,6vw,58px);line-height:1.02;margin:0;text-wrap:balance}
+.lede{color:var(--ink2);font-size:17px;margin:0}
+.intro-actions{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:6px}
+
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 14.5px/1 var(--body);text-decoration:none;border-radius:999px;padding:11px 18px;border:1.5px solid var(--ink)}
+.btn-primary{background:var(--g);border-color:var(--g);color:var(--g-ink)}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-ghost{color:var(--ink)}
+.btn-ghost:hover{background:var(--ink);color:var(--ground)}
+.textlink{font-size:14.5px;color:var(--ink2);text-underline-offset:3px}
+.textlink:hover{color:var(--g)}
+
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.card{display:grid;grid-template-rows:auto 1fr;background:var(--paper);border:1px solid var(--rule);border-radius:10px;overflow:hidden;min-width:0}
+.art{display:block;aspect-ratio:16/9;max-width:100%;border-bottom:1px solid var(--rule);background:var(--ground)}
+.art svg{display:block;width:100%;height:100%}
+.card-body{display:grid;gap:10px;padding:20px 22px 22px;align-content:start;min-width:0}
+.meta{font:12px/1.4 var(--mono);color:var(--ink3);letter-spacing:.02em}
+.card h2{font-family:var(--display);font-weight:500;font-size:28px;line-height:1.1;margin:0;text-wrap:balance}
+.card h2 a{text-decoration:none}
+.card h2 a:hover{color:var(--g)}
+.card p{margin:0;color:var(--ink2);font-size:15.5px}
+.card-actions{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:6px}
+
+.feedback{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px 48px;border-top:1px solid var(--rule);padding-top:36px}
+@media (max-width:760px){.feedback{grid-template-columns:1fr}}
+.feedback h2{font-family:var(--display);font-weight:500;font-size:clamp(28px,4vw,38px);line-height:1.08;margin:6px 0 10px;text-wrap:balance}
+.feedback p{margin:0 0 16px;color:var(--ink2)}
+.asks{margin:0;padding:0;list-style:none;display:grid;gap:12px}
+.asks li{display:grid;grid-template-columns:18px 1fr;gap:10px;color:var(--ink2)}
+.asks li::before{content:"";width:9px;height:9px;border-radius:50%;border:1.5px solid var(--g);margin-top:8px}
+.fine{font-size:13px;color:var(--ink3);max-width:72ch;margin:0}
+
+/* illustration strokes and fills, from the tokens */
+.s-rule{stroke:var(--rule)} .s-ink3{stroke:var(--ink3)} .s-ink2{stroke:var(--ink2)} .s-g{stroke:var(--g)}
+.f-paper{fill:var(--paper)} .f-g{fill:var(--g)} .f-ink2{fill:var(--ink2)} .f-ink3{fill:var(--ink3)} .f-rule{fill:var(--rule)} .f-none{fill:none}
+.t-mono{font-family:var(--mono);font-size:9px;fill:var(--ink3)}
+.t-on{fill:var(--g-ink)}
+@media (prefers-reduced-motion: no-preference){
+  .card .art svg .spin{transition:transform .9s ease}
+  .card:hover .art svg .spin{transform:translateX(-14px)}
+}
+</style>
+</head>
+<body>
+
+<div class="lab" role="note" aria-label="About these prototypes">
+  <div class="lab-in">
+    <div class="lab-brand"><span class="lab-mark" aria-hidden="true"></span>O'Keeffe Experiments</div>
+    <div class="lab-note"><span class="lab-pill">Prototypes</span><span>The following prototypes are for experimental purposes and use information that has not been reviewed.</span></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="intro">
+    <div class="eyebrow">Georgia O'Keeffe Museum · Digital Experience</div>
+    <h1>Ways into O'Keeffe's work</h1>
+    <p class="lede">These prototypes turn Georgia O'Keeffe Museum data into things you can explore, from maps and timelines to works shown at their true size. Each is built in p5.js, a creative coding tool made for artists, with the help of generative AI. New experiments will be added here as they're ready. Try any of them, then tell us what you think.</p>
+    <div class="intro-actions">
+      <a class="btn btn-primary" href="https://docs.google.com/forms/d/e/1FAIpQLSdsjmbq0M56niYfdl4N5c52cS8dOA0HCDvSLCFJTwfPspdQbg/viewform?usp=publish-editor" target="_blank" rel="noopener">Share your feedback ↗</a>
+      <a class="textlink" href="#prototypes">See the prototypes ↓</a>
+    </div>
+  </section>
+
+  <section class="grid" id="prototypes" aria-label="Prototypes">
+
+    <article class="card">
+      <a class="art" href="https://ok-near-me-prototype.netlify.app/" target="_blank" rel="noopener" aria-hidden="true" tabindex="-1">
+        <svg viewBox="0 0 320 180" role="img" aria-label="">
+          <circle cx="160" cy="92" r="70" class="f-paper s-rule" stroke-width="1.5"/>
+          <ellipse cx="160" cy="92" rx="30" ry="70" class="f-none s-rule"/>
+          <ellipse cx="160" cy="92" rx="58" ry="70" class="f-none s-rule"/>
+          <ellipse cx="160" cy="92" rx="70" ry="24" class="f-none s-rule"/>
+          <line x1="90" y1="92" x2="230" y2="92" class="s-rule"/>
+          <g class="spin">
+            <circle cx="132" cy="84" r="11" class="f-g" opacity=".85"/>
+            <circle cx="176" cy="70" r="7" class="f-g" opacity=".85"/>
+            <circle cx="188" cy="78" r="5" class="f-g" opacity=".85"/>
+            <circle cx="196" cy="70" r="4" class="f-g" opacity=".85"/>
+            <circle cx="166" cy="96" r="4.5" class="f-g" opacity=".85"/>
+            <circle cx="112" cy="74" r="4" class="f-g" opacity=".85"/>
+            <circle cx="150" cy="112" r="3.5" class="f-g" opacity=".85"/>
+            <circle cx="206" cy="98" r="3" class="f-g" opacity=".85"/>
+          </g>
+          <circle cx="146" cy="64" r="4" class="f-ink2"/>
+          <circle cx="146" cy="64" r="9" class="f-none s-ink2" stroke-width="1"/>
+          <line x1="146" y1="64" x2="132" y2="84" class="s-ink2" stroke-dasharray="3 3"/>
+        </svg>
+      </a>
+      <div class="card-body">
+        <div class="meta">Globe · 137 public collections</div>
+        <h2><a href="https://ok-near-me-prototype.netlify.app/" target="_blank" rel="noopener">Find an O'Keeffe Near You</a></h2>
+        <p>Turn a globe to find where you are, then click that spot to see the nearest public collections that hold her work. The 1,507 works on the globe are held in nine countries and territories.</p>
+        <div class="card-actions">
+          <a class="btn btn-ghost" href="https://ok-near-me-prototype.netlify.app/" target="_blank" rel="noopener">Open prototype ↗</a>
+          <a class="textlink" href="https://docs.google.com/forms/d/e/1FAIpQLSdsjmbq0M56niYfdl4N5c52cS8dOA0HCDvSLCFJTwfPspdQbg/viewform?usp=publish-editor" target="_blank" rel="noopener">Give feedback</a>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <a class="art" href="https://ok-scale-prototype.netlify.app/" target="_blank" rel="noopener" aria-hidden="true" tabindex="-1">
+        <svg viewBox="0 0 320 180" role="img" aria-label="">
+          <line x1="40" y1="150" x2="290" y2="150" class="s-ink3"/>
+          <line x1="40" y1="22" x2="40" y2="150" class="s-ink3"/>
+          <line x1="40" y1="54" x2="290" y2="54" class="s-rule" stroke-dasharray="2 4"/>
+          <rect x="40" y="38" width="236" height="112" class="f-none s-ink3" stroke-width="1.2"/>
+          <rect x="40" y="70" width="86" height="80" class="f-none s-g" stroke-width="1.4"/>
+          <rect x="40" y="88" width="64" height="62" class="f-none s-g" stroke-width="1.2" opacity=".8"/>
+          <rect x="40" y="104" width="40" height="46" class="f-none s-ink2" stroke-width="1.2"/>
+          <rect x="40" y="118" width="26" height="32" class="f-none s-g" stroke-width="1"/>
+          <rect x="40" y="128" width="16" height="22" class="f-none s-ink2" stroke-width="1"/>
+          <path class="f-ink3" fill-rule="evenodd" d="M249.3 54.0 L250.3 54.6 L250.3 54.7 L251.1 55.3 L251.5 55.5 L252.7 56.7 L253.3 57.0 L254.0 57.7 L255.4 58.6 L256.6 59.7 L256.9 60.3 L256.9 61.0 L256.3 61.8 L256.0 62.3 L256.1 62.5 L256.0 62.6 L257.6 64.9 L258.5 66.5 L259.3 67.1 L259.0 67.4 L258.5 67.4 L257.9 67.1 L257.5 67.1 L257.0 66.8 L256.6 66.8 L256.1 66.5 L255.7 66.5 L254.6 65.9 L254.2 65.9 L254.0 66.1 L254.0 67.3 L253.3 68.3 L253.3 68.9 L253.0 69.5 L252.1 70.1 L252.7 71.0 L254.3 74.4 L254.5 77.1 L254.6 77.3 L254.6 79.2 L254.5 79.3 L254.5 79.8 L254.6 79.9 L254.6 82.8 L254.5 82.9 L254.5 84.4 L254.3 84.6 L254.3 85.0 L254.5 85.1 L254.5 85.6 L254.3 85.8 L254.3 87.0 L254.2 87.1 L254.2 87.7 L254.0 87.8 L254.0 89.9 L253.9 90.1 L254.0 90.7 L253.5 91.1 L253.3 91.0 L253.0 91.1 L253.0 92.0 L252.6 92.2 L252.4 92.5 L252.6 92.6 L252.6 93.4 L252.9 93.7 L253.1 94.7 L254.3 96.9 L254.5 97.5 L254.8 97.8 L254.8 98.3 L255.0 98.4 L255.1 99.5 L255.2 99.6 L255.2 100.4 L255.4 100.5 L255.4 101.7 L255.2 101.9 L255.2 104.4 L255.4 104.5 L255.4 105.7 L255.5 105.9 L255.5 106.9 L255.7 107.1 L255.8 112.0 L256.0 112.1 L256.0 114.7 L256.1 114.8 L256.1 115.7 L256.3 115.9 L256.3 116.8 L256.4 116.9 L256.4 118.4 L256.6 118.5 L256.6 119.6 L256.7 119.7 L256.7 122.7 L256.6 122.9 L256.6 123.5 L256.1 123.9 L255.5 125.4 L255.5 126.4 L255.4 126.6 L255.4 129.0 L255.2 129.1 L255.4 129.4 L255.4 131.4 L255.2 131.5 L255.2 134.6 L255.1 134.8 L255.1 135.7 L255.0 135.8 L254.0 135.7 L253.8 136.0 L253.8 137.5 L253.6 137.6 L253.6 138.2 L253.5 138.4 L253.5 142.2 L253.6 142.4 L253.8 143.4 L254.3 144.5 L254.5 145.7 L254.6 145.8 L254.6 147.6 L254.2 148.7 L254.2 150.0 L244.2 150.0 L243.8 149.6 L243.8 148.8 L243.9 148.7 L243.9 148.4 L244.7 147.6 L244.4 147.3 L243.8 147.0 L243.5 147.0 L243.0 146.7 L241.4 146.4 L241.4 145.5 L241.5 145.2 L242.0 144.9 L243.3 144.9 L243.5 144.8 L244.1 144.8 L244.2 144.6 L245.3 144.5 L245.7 143.9 L246.3 143.6 L246.7 143.6 L247.5 143.1 L248.1 143.1 L248.4 142.7 L248.4 142.0 L248.5 141.8 L248.5 140.5 L248.4 140.3 L248.4 138.7 L248.2 138.5 L248.2 137.5 L248.1 137.3 L248.1 136.0 L247.8 135.5 L246.0 135.5 L245.4 136.0 L244.5 136.0 L244.4 136.1 L239.3 136.1 L238.9 135.8 L238.0 135.8 L237.2 135.5 L237.0 134.8 L236.9 134.6 L236.8 129.9 L236.6 129.7 L236.6 127.3 L236.5 127.2 L236.5 124.1 L236.3 123.9 L236.3 116.0 L236.5 115.9 L236.5 112.1 L236.6 112.0 L236.8 107.1 L236.9 106.9 L236.9 105.3 L237.0 105.1 L237.0 103.9 L237.2 103.8 L237.2 102.6 L237.4 102.4 L237.4 100.8 L237.5 100.7 L237.5 99.5 L237.7 99.3 L237.7 98.1 L237.8 98.0 L238.0 95.7 L238.1 95.6 L238.1 95.0 L238.2 94.9 L238.4 94.0 L239.6 91.6 L239.7 90.7 L239.9 90.5 L239.9 89.9 L239.7 89.8 L239.7 89.5 L239.0 88.6 L237.8 87.8 L237.4 87.4 L236.6 87.1 L236.2 87.1 L235.4 86.3 L235.3 86.3 L234.8 85.5 L234.5 85.1 L234.2 85.1 L234.2 84.9 L234.1 84.7 L234.1 84.3 L234.4 83.8 L234.4 83.5 L234.2 83.4 L233.9 83.4 L233.8 83.5 L233.3 84.6 L232.6 84.6 L232.6 84.1 L232.1 83.8 L232.1 83.1 L234.4 80.7 L235.3 80.7 L235.4 80.5 L235.7 80.5 L236.6 79.6 L236.6 79.5 L238.4 77.4 L238.2 76.1 L237.7 74.4 L237.7 73.5 L238.0 72.8 L238.2 72.6 L238.4 72.2 L239.4 71.1 L239.4 71.0 L239.9 70.7 L240.6 70.7 L241.1 70.4 L241.7 70.4 L242.4 71.0 L243.2 71.1 L243.6 70.7 L243.6 70.4 L243.9 70.1 L244.4 69.2 L244.4 68.9 L243.8 68.5 L243.6 68.2 L243.0 67.9 L243.2 67.7 L242.4 67.0 L242.1 67.0 L241.5 66.5 L241.5 65.8 L241.8 65.3 L241.8 64.7 L242.0 64.6 L242.1 63.4 L242.3 63.2 L242.3 63.0 L242.0 62.6 L241.7 61.9 L242.3 61.3 L243.3 60.7 L243.9 60.1 L244.1 59.5 L243.5 58.9 L241.1 57.4 L239.9 56.2 L239.9 55.5 L240.0 55.3 L240.8 55.2 L240.9 55.3 L241.7 55.5 L242.6 56.1 L242.9 56.1 L244.1 56.7 L244.7 56.7 L244.8 56.8 L245.6 57.0 L246.1 56.5 L248.5 54.0 Z M238.4 79.5 L238.2 79.5 L238.0 79.8 L238.0 79.9 L237.2 81.0 L237.7 81.4 L237.8 81.4 L238.2 82.0 L238.4 81.9 L238.4 79.9 L238.5 79.8 Z M244.8 71.4 L244.4 71.4 L244.1 71.6 L242.9 72.6 L242.9 73.7 L243.0 73.8 L243.0 74.6 L242.6 75.3 L242.4 76.1 L241.8 77.1 L241.8 79.8 L242.0 79.9 L242.3 79.9 L243.2 79.0 L243.2 78.6 L243.3 78.3 L243.6 78.1 L244.5 76.2 L244.4 75.3 L243.8 74.1 L243.8 73.1 L244.2 72.6 L244.8 72.6 L245.0 72.9 L245.0 73.5 L245.3 74.0 L245.6 73.8 L245.6 73.5 L245.9 73.2 L245.7 72.9 L245.7 72.5 L245.4 72.2 L245.3 72.3 L245.0 72.3 L245.0 71.6 Z"/>
+          <text x="227" y="51" class="t-mono" text-anchor="end">5 ft 5 in</text>
+        </svg>
+      </a>
+      <div class="card-body">
+        <div class="meta">True size · 2,024 works</div>
+        <h2><a href="https://ok-scale-prototype.netlify.app/" target="_blank" rel="noopener">O'Keeffe to Scale</a></h2>
+        <p>View paintings, watercolors, pastels, and drawings in the catalogue raisonné, each drawn as an outline at its true size, beside a silhouette of O'Keeffe at 5 feet 5 inches. Play through her career year by year, or compare subjects side by side.</p>
+        <div class="card-actions">
+          <a class="btn btn-ghost" href="https://ok-scale-prototype.netlify.app/" target="_blank" rel="noopener">Open prototype ↗</a>
+          <a class="textlink" href="https://docs.google.com/forms/d/e/1FAIpQLSdsjmbq0M56niYfdl4N5c52cS8dOA0HCDvSLCFJTwfPspdQbg/viewform?usp=publish-editor" target="_blank" rel="noopener">Give feedback</a>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <a class="art" href="https://ok-subjects-prototype.netlify.app/" target="_blank" rel="noopener" aria-hidden="true" tabindex="-1">
+        <svg viewBox="0 0 320 180" role="img" aria-label="">
+          <circle cx="128" cy="96" r="52" class="f-paper s-ink3" stroke-width="1.2"/>
+          <circle cx="112" cy="84" r="22" class="f-none s-g" stroke-width="1.2"/>
+          <circle cx="148" cy="112" r="18" class="f-none s-g" stroke-width="1.2"/>
+          <circle cx="140" cy="72" r="10" class="f-none s-g"/>
+          <circle cx="104" cy="120" r="9" class="f-none s-g"/>
+          <g class="f-g">
+            <circle cx="104" cy="78" r="3"/><circle cx="116" cy="90" r="3"/><circle cx="120" cy="76" r="3"/><circle cx="106" cy="92" r="3"/>
+            <circle cx="146" cy="108" r="3"/><circle cx="154" cy="118" r="3"/><circle cx="140" cy="118" r="3"/>
+          </g>
+          <circle cx="222" cy="70" r="34" class="f-paper s-ink3" stroke-width="1.2"/>
+          <circle cx="212" cy="64" r="12" class="f-none s-ink2"/>
+          <circle cx="236" cy="80" r="10" class="f-none s-ink2"/>
+          <circle cx="232" cy="134" r="22" class="f-paper s-ink3" stroke-width="1.2"/>
+          <circle cx="272" cy="112" r="13" class="f-paper s-ink3" stroke-width="1.2"/>
+          <circle cx="190" cy="140" r="9" class="f-paper s-ink3" stroke-width="1.2"/>
+        </svg>
+      </a>
+      <div class="card-body">
+        <div class="meta">Bubble chart · subjects</div>
+        <h2><a href="https://ok-subjects-prototype.netlify.app/" target="_blank" rel="noopener">O'Keeffe's Subjects</a></h2>
+        <p>O'Keeffe's works grouped by what they show, from landscapes and flowers to bones, buildings, and abstractions. Click a bubble to break it apart into smaller subjects, down to the individual works. This is based on previous prototypes sketched with digital partners Design for Context.</p>
+        <div class="card-actions">
+          <a class="btn btn-ghost" href="https://ok-subjects-prototype.netlify.app/" target="_blank" rel="noopener">Open prototype ↗</a>
+          <a class="textlink" href="https://docs.google.com/forms/d/e/1FAIpQLSdsjmbq0M56niYfdl4N5c52cS8dOA0HCDvSLCFJTwfPspdQbg/viewform?usp=publish-editor" target="_blank" rel="noopener">Give feedback</a>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <a class="art" href="https://gok-in-context-prototype.netlify.app/" target="_blank" rel="noopener" aria-hidden="true" tabindex="-1">
+        <svg viewBox="0 0 320 180" role="img" aria-label="">
+          <line x1="28" y1="104" x2="292" y2="104" class="s-ink3" stroke-width="1.2"/>
+          <g class="s-rule"><line x1="64" y1="98" x2="64" y2="110"/><line x1="120" y1="98" x2="120" y2="110"/><line x1="176" y1="98" x2="176" y2="110"/><line x1="232" y1="98" x2="232" y2="110"/><line x1="288" y1="98" x2="288" y2="110"/></g>
+          <g class="f-ink3" opacity=".7">
+            <circle cx="44" cy="92" r="2.5"/><circle cx="70" cy="86" r="2.5"/><circle cx="84" cy="92" r="2.5"/><circle cx="98" cy="80" r="2.5"/><circle cx="110" cy="92" r="2.5"/>
+            <circle cx="126" cy="86" r="2.5"/><circle cx="140" cy="92" r="2.5"/><circle cx="150" cy="80" r="2.5"/><circle cx="162" cy="86" r="2.5"/><circle cx="184" cy="92" r="2.5"/>
+            <circle cx="196" cy="86" r="2.5"/><circle cx="214" cy="92" r="2.5"/><circle cx="226" cy="80" r="2.5"/><circle cx="246" cy="92" r="2.5"/><circle cx="262" cy="86" r="2.5"/><circle cx="276" cy="92" r="2.5"/>
+          </g>
+          <g class="f-g"><circle cx="40" cy="104" r="5"/><circle cx="284" cy="104" r="5"/></g>
+          <line x1="132" y1="104" x2="132" y2="44" class="s-g" stroke-width="1.2"/>
+          <rect x="120" y="34" width="44" height="10" rx="5" class="f-g"/>
+          <line x1="202" y1="104" x2="202" y2="60" class="s-ink2"/>
+          <rect x="192" y="52" width="34" height="9" rx="4.5" class="f-ink2"/>
+          <rect x="140" y="118" width="62" height="40" class="f-paper s-rule"/>
+          <rect x="146" y="124" width="20" height="28" class="f-rule"/>
+          <rect x="172" y="128" width="24" height="3" class="f-ink3"/>
+          <rect x="172" y="136" width="18" height="3" class="f-rule"/>
+          <text x="28" y="126" class="t-mono">1875</text>
+          <text x="270" y="126" class="t-mono">1986</text>
+        </svg>
+      </a>
+      <div class="card-body">
+        <div class="meta">Timeline · 1875–1986</div>
+        <h2><a href="https://gok-in-context-prototype.netlify.app/" target="_blank" rel="noopener">O'Keeffe in Context</a></h2>
+        <p>Moments from her life set beside world events and the art of her time, from 1875 to 1986. Select an event to read about it and see a work from the catalogue raisonné made the same year.</p>
+        <div class="card-actions">
+          <a class="btn btn-ghost" href="https://gok-in-context-prototype.netlify.app/" target="_blank" rel="noopener">Open prototype ↗</a>
+          <a class="textlink" href="https://docs.google.com/forms/d/e/1FAIpQLSdsjmbq0M56niYfdl4N5c52cS8dOA0HCDvSLCFJTwfPspdQbg/viewform?usp=publish-editor" target="_blank" rel="noopener">Give feedback</a>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <a class="art" href="https://eye-for-okeeffe-prototype.netlify.app/" target="_blank" rel="noopener" aria-hidden="true" tabindex="-1">
+        <svg viewBox="0 0 320 180" role="img" aria-label="">
+          <g class="f-none s-rule" stroke-width="1.2"><circle cx="232" cy="22" r="4"/><circle cx="246" cy="22" r="4"/><circle cx="260" cy="22" r="4"/></g>
+          <circle cx="204" cy="22" r="4" class="f-g"/><circle cx="218" cy="22" r="4" class="f-g"/>
+          <rect x="58" y="36" width="90" height="104" class="f-paper s-ink3" stroke-width="1.2"/>
+          <rect x="172" y="44" width="98" height="88" class="f-paper s-ink3" stroke-width="1.2"/>
+          <line x1="103" y1="88" x2="91" y2="74" class="s-ink2" stroke-width="1.4"/>
+          <rect x="100" y="85" width="6" height="6" class="f-none s-ink2" stroke-width="1.2"/>
+          <circle cx="86" cy="68" r="12" class="f-none s-g" stroke-width="2.4"/>
+          <line x1="221" y1="88" x2="209" y2="76" class="s-ink2" stroke-width="1.4" stroke-dasharray="3 2"/>
+          <rect x="218" y="85" width="6" height="6" class="f-none s-ink2" stroke-width="1.2"/>
+          <circle cx="204" cy="70" r="12" class="f-none s-ink2" stroke-width="2" stroke-dasharray="4 3"/>
+          <rect x="100" y="150" width="56" height="18" rx="9" class="f-g"/>
+          <text x="128" y="162" class="t-mono t-on" text-anchor="middle">Similar</text>
+          <rect x="164" y="150" width="62" height="18" rx="9" class="f-none s-ink3" stroke-width="1.2"/>
+          <text x="195" y="162" class="t-mono" text-anchor="middle">Different</text>
+        </svg>
+      </a>
+      <div class="card-body">
+        <div class="meta">Quiz · five rounds</div>
+        <h2><a href="https://eye-for-okeeffe-prototype.netlify.app/" target="_blank" rel="noopener">Eye for O'Keeffe</a></h2>
+        <p>How well do you read an O'Keeffe? Look at two of her works and decide whether their compositions are similar. Then see how a computer reads them, and find out how often you agree over five rounds. This prototype is based on a computer vision prototype by Jonathan Lee from NMHU.</p>
+        <div class="card-actions">
+          <a class="btn btn-ghost" href="https://eye-for-okeeffe-prototype.netlify.app/" target="_blank" rel="noopener">Open prototype ↗</a>
+          <a class="textlink" href="https://docs.google.com/forms/d/e/1FAIpQLSdsjmbq0M56niYfdl4N5c52cS8dOA0HCDvSLCFJTwfPspdQbg/viewform?usp=publish-editor" target="_blank" rel="noopener">Give feedback</a>
+        </div>
+      </div>
+    </article>
+
+  </section>
+
+  <section class="feedback" aria-labelledby="fb-h">
+    <div>
+      <div class="eyebrow">Feedback</div>
+      <h2 id="fb-h">Tell us what you found</h2>
+      <p>Your feedback shapes where these experiments go next. You don't need to try every prototype before you respond.</p>
+      <a class="btn btn-primary" href="https://docs.google.com/forms/d/e/1FAIpQLSdsjmbq0M56niYfdl4N5c52cS8dOA0HCDvSLCFJTwfPspdQbg/viewform?usp=publish-editor" target="_blank" rel="noopener">Open the feedback form ↗</a>
+    </div>
+    <ul class="asks" aria-label="Things we'd love to hear about">
+      <li>Which prototype you spent the most time with, and why</li>
+      <li>Anything that was confusing, slow, or didn't work on your device</li>
+      <li>Something you learned about O'Keeffe or her work that surprised you</li>
+      <li>What you'd want to see next, or how you might use one of these</li>
+    </ul>
+  </section>
+
+  <p class="fine">O'Keeffe Experiments is a digital experience lab at the Georgia O'Keeffe Museum. These prototypes use collection data, including the catalogue raisonné, that has not been reviewed for publication, along with some information added with the help of AI. Images are provided through the Museum's IIIF image service.</p>
+</main>
+
+</body>
+</html>
