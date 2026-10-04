@@ -150,11 +150,18 @@
     </section>
   </main>
 
-  <footer class="foot">
-    <p class="fine">O'Keeffe Experiments is a digital experience lab at the Georgia O'Keeffe Museum. This prototype uses collection data, including the catalogue raisonné, that has not been reviewed for publication. Images are provided through the Museum's IIIF image service.</p>
-  </footer>
-<!-- O'Keeffe Experiments: "All prototypes" link (v2). Paste just before </body>. -->
+<!-- O'Keeffe Experiments: shared banner link + footer (v3).
+     Paste this whole block just before </body> in any prototype's index.html.
+     It replaces the earlier "All prototypes" block (v1 or v2): delete that one first.
+
+     It does two things:
+     1. Adds "All prototypes" to the O'Keeffe Experiments banner without making it taller.
+     2. Sets the footer text and adds a "Share your feedback" link. If the page already
+        has a footer note (class "fine"), its text is replaced; if not, a footer is added.
+
+     To change the footer wording or links later, edit the three lines marked EDIT below. -->
 <style>
+  /* Banner link */
   .okx-home {
     flex: none; display: inline-flex; align-items: center; gap: 7px; margin-left: auto;
     font: 600 13px/1 "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -163,7 +170,7 @@
   }
   .okx-home svg { width: 12px; height: 12px; flex: none; }
   .okx-home:hover { background: rgba(127, 127, 127, .2); }
-  .okx-home:focus-visible { outline: 2px solid #E8746A; outline-offset: 3px; }
+  .okx-home:focus-visible, .okx-feedback:focus-visible { outline: 2px solid #E8746A; outline-offset: 3px; }
   .okx-banner .lab-note { flex: 1 1 320px; min-width: 0; }
   @media (max-width: 760px) {
     .okx-banner .okx-home { order: 1; padding: 5px 11px; }
@@ -174,6 +181,23 @@
     .okx-home .okx-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
   .okx-bar { background: #1D2226; color: #EEF0EE; padding: 10px 20px; display: flex; }
+
+  /* Footer */
+  .okx-footer { max-width: 1120px; margin: 0 auto; padding: 24px 20px 48px; }
+  .okx-footer-in { display: grid; gap: 12px; justify-items: start; }
+  .okx-fine {
+    margin: 0; max-width: 80ch;
+    font: 13px/1.55 "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--ink3, #7C868D);
+  }
+  .okx-fine em { font-style: italic; }
+  .okx-feedback {
+    display: inline-flex; align-items: center; gap: 6px;
+    font: 600 13.5px/1 "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--ink, #1D2226); text-decoration: none;
+    border: 1.5px solid currentColor; border-radius: 999px; padding: 8px 14px;
+  }
+  .okx-feedback:hover { background: var(--ink, #1D2226); color: var(--ground, #EEF0EE); }
 </style>
 <a class="okx-home" href="https://okeeffe-experiments.netlify.app/" title="All O'Keeffe Experiments prototypes">
   <svg viewBox="0 0 12 12" aria-hidden="true"><g fill="currentColor"><rect x="0" y="0" width="5" height="5" rx="1"/><rect x="7" y="0" width="5" height="5" rx="1"/><rect x="0" y="7" width="5" height="5" rx="1"/><rect x="7" y="7" width="5" height="5" rx="1"/></g></svg>
@@ -181,6 +205,13 @@
 </a>
 <script>
   (function () {
+    // EDIT: footer text (HTML is allowed, e.g. <em>)
+    var FOOTER_TEXT = "O'Keeffe Experiments is from the Digital Experience team at the Georgia O'Keeffe Museum. These prototypes use data and images from <em>Access O'Keeffe</em>, including the catalogue raisonné, along with some subject information added with the help of AI. Because these are prototypes, the data and images have not been reviewed for publication in this format.";
+    // EDIT: feedback form link and its label
+    var FEEDBACK_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdsjmbq0M56niYfdl4N5c52cS8dOA0HCDvSLCFJTwfPspdQbg/viewform?usp=publish-editor";
+    var FEEDBACK_LABEL = "Share your feedback ↗";
+
+    // 1. Banner link
     var link = document.currentScript.previousElementSibling;
     var banner = document.querySelector(".lab-in");
     if (banner) {
@@ -191,6 +222,34 @@
       bar.className = "okx-bar";
       bar.appendChild(link);
       document.body.insertBefore(bar, document.body.firstChild);
+    }
+
+    // 2. Footer
+    var feedback = document.createElement("a");
+    feedback.className = "okx-feedback";
+    feedback.href = FEEDBACK_URL;
+    feedback.target = "_blank";
+    feedback.rel = "noopener";
+    feedback.textContent = FEEDBACK_LABEL;
+
+    var existing = document.querySelector("footer .fine") || document.querySelector(".foot .fine");
+    if (existing) {
+      existing.innerHTML = FOOTER_TEXT;
+      existing.insertAdjacentElement("afterend", feedback);
+      feedback.style.marginTop = "12px";
+    } else {
+      var footer = document.createElement("footer");
+      footer.className = "okx-footer";
+      footer.innerHTML = '<div class="okx-footer-in"><p class="okx-fine"></p></div>';
+      footer.querySelector(".okx-fine").innerHTML = FOOTER_TEXT;
+      footer.firstChild.appendChild(feedback);
+      // Line the footer up with the banner's content width
+      if (banner) footer.style.maxWidth = getComputedStyle(banner).maxWidth;
+      document.body.appendChild(footer);
+      // p5 may add its canvas to the end of the page after this runs; keep the footer last.
+      window.addEventListener("load", function () {
+        setTimeout(function () { document.body.appendChild(footer); }, 300);
+      });
     }
   })();
 </script>
