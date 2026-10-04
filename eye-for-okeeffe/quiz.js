@@ -317,7 +317,7 @@ function endGame() {
         <img src="${iiifURL(r.b, "square/!112,112")}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
       </span>
       <span class="what"><i>${esc(r.a.shortTitle)}</i> and <i>${esc(r.b.shortTitle)}</i><br>
-        You said ${r.answer}. The computer said ${r.truth}.</span>
+        You said ${r.answer === "alike" ? "similar" : "different"}. The computer said ${r.truth === "alike" ? "similar" : "different"}.</span>
       <span class="mark ${r.agree ? "agree" : "differ"}">${r.agree ? "Agreed" : "Differed"}</span>
     </li>`).join("");
 
