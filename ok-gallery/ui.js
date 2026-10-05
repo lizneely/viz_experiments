@@ -144,6 +144,7 @@ function buildWallControls() {
   $("#opt-labels").addEventListener("change", e => { G.showLabels = e.target.checked; wallChanged({}); });
   $("#opt-figure").addEventListener("change", e => { G.showFigure = e.target.checked; wallChanged({}); });
   $("#opt-guide").addEventListener("change", e => { G.showGuide = e.target.checked; wallChanged({}); });
+  $("#opt-snap").addEventListener("change", e => setSnap(e.target.checked));
 
   for (const [sel, key] of [["#t-title", "title"], ["#t-intro", "intro"], ["#t-curator", "curator"]]) {
     $(sel).addEventListener("input", e => { G[key] = e.target.value; wallChanged({ text: true }); });
@@ -195,6 +196,8 @@ function syncWallControls() {
   $("#opt-labels").closest("label").classList.toggle("off", G.hang === "salon");
   $("#opt-figure").checked = G.showFigure;
   $("#opt-guide").checked = G.showGuide;
+  $("#snap-wrap").hidden = G.hang !== "salon";
+  $("#opt-snap").checked = G.snap;
   $("#t-title").value = G.title; $("#t-intro").value = G.intro; $("#t-curator").value = G.curator;
 }
 
@@ -228,7 +231,9 @@ function renderOnWall() {
   $("#rehang").hidden = G.hang !== "salon" || n < 2;
   $("#drag-hint").textContent = G.hang === "line"
     ? "Drag a work along the wall to change the order. Click a work for its details."
-    : "Drag a work anywhere on the wall; it slides to the nearest open spot. Re-hang packs them again.";
+    : G.snap
+      ? "Drag a work anywhere on the wall; it slides to the nearest open spot. Re-hang packs them again."
+      : "Drag a work anywhere on the wall; it stays exactly where you drop it. Re-hang packs them again.";
 
   const names = G.ids.map(id => WORK_BY_ID.get(id).title);
   const hangText = G.hang === "line" ? "hung at eye level, 60 inches on center" : "in a salon hang";
@@ -271,12 +276,85 @@ function checkImages() {
   else if (imgStats.ok > 0) $("#img-note").hidden = true;
 }
 
+/* ---------- sharing ---------- */
+
+function buildShare() {
+  $("#copy-link").hidden = !canShareLink();
+  if (canShareLink()) $("#share-note").textContent = "The image shows your wall to scale, with the title wall and a numbered checklist. The link opens your exhibition for anyone, no account needed.";
+  $("#save-image").addEventListener("click", openSharePanel);
+  $("#copy-checklist").addEventListener("click", () => copyText(checklistText(), "Checklist"));
+  $("#copy-link").addEventListener("click", () => copyText(shareLink(), "Link"));
+  $("#sp-close").addEventListener("click", closeSharePanel);
+  // In the claude.ai preview, files are offered through the viewer's downloads capability;
+  // on the hosted page the plain download link does the job.
+  $("#sp-download").addEventListener("click", async e => {
+    if (!window.claude || !window.claude.use || !posterBlob) return;
+    e.preventDefault();
+    const name = posterFileName();
+    try {
+      const dl = await window.claude.use("downloads");
+      if (!dl) { flash("Right-click or long-press the image to save it."); return; }
+      await dl.save({ filename: name, data: posterBlob });
+      flash("Image saved.");
+    } catch (err) {
+      if (err && err.code === "declined") return;
+      flash("The image couldn't be saved here. Right-click or long-press it instead.");
+    }
+  });
+  $("#share-panel").addEventListener("click", e => { if (e.target.id === "share-panel") closeSharePanel(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#share-panel").hidden) closeSharePanel(); });
+}
+
+function copyText(text, what) {
+  const ta = $("#share-text");
+  const fallback = () => {
+    ta.value = text; ta.hidden = false; ta.focus(); ta.select();
+    flash(`Select the text below and copy it.`);
+  };
+  try {
+    navigator.clipboard.writeText(text).then(() => { ta.hidden = true; flash(`${what} copied.`); }, fallback);
+  } catch (e) { fallback(); }
+}
+
+let posterUrl = null, posterBlob = null, lastFocus = null;
+async function openSharePanel() {
+  lastFocus = document.activeElement;
+  const panel = $("#share-panel"), img = $("#sp-img"), dl = $("#sp-download"), status = $("#sp-status");
+  panel.hidden = false;
+  status.textContent = "Making your image…";
+  img.removeAttribute("src"); dl.hidden = true;
+  $("#sp-close").focus();
+  try {
+    const { canvas, missing } = await renderPoster();
+    const blob = await new Promise((res, rej) => canvas.toBlob(b => (b ? res(b) : rej(new Error("toBlob failed"))), "image/png"));
+    if (posterUrl) URL.revokeObjectURL(posterUrl);
+    posterBlob = blob;
+    posterUrl = URL.createObjectURL(blob);
+    img.src = posterUrl;
+    img.alt = `${exhibitionTitle()}: a wall of ${G.ids.length} ${G.ids.length === 1 ? "work" : "works"} by Georgia O'Keeffe with a numbered checklist.`;
+    dl.href = posterUrl; dl.download = posterFileName(); dl.hidden = false;
+    status.textContent = missing
+      ? `${missing === G.ids.length ? "The images" : missing + " of the images"} couldn't be included here, so ${missing === 1 ? "that work appears" : "those works appear"} as bands of ${missing === 1 ? "its" : "their"} color tags.`
+      : "Here's your exhibition, ready to save and share.";
+  } catch (err) {
+    console.error(err);
+    status.textContent = "The image couldn't be made. Try Copy checklist instead.";
+  }
+}
+
+function closeSharePanel() {
+  $("#share-panel").hidden = true;
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+
 /* ---------- start ---------- */
 
 function onSketchReady() {
   loadWorks().then(() => {
-    loadState();
+    const fromLink = loadStateFromLink();
+    if (!fromLink) loadState();
     buildFilters();
+    buildShare();
     buildWallControls();
     syncWallControls();
     renderResults();
@@ -288,6 +366,7 @@ function onSketchReady() {
     });
     wallChanged({ refit: true });
     $("#loading").hidden = true;
+    if (fromLink) flash("You're looking at a shared exhibition. Any changes you make stay on this device.");
     setInterval(checkImages, 1500);
   }).catch(err => {
     console.error(err);

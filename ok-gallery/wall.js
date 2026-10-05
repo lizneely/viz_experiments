@@ -33,6 +33,8 @@ const G = {
   showFigure: true,
   showGuide: true,
   salon: {},          // id -> {x, y}: centre of the work; x relative to the cluster, y from the floor
+  snap: true,         // salon: keep works apart (slide to the nearest open spot); off = free placement
+  z: {},              // salon stacking order when works overlap (free placement)
   selected: null
 };
 
@@ -66,6 +68,7 @@ let imgCache = new Map();
 let imgStats = { ok: 0, fail: 0 };
 let wrapCache = new Map();
 let cnv;
+let exporting = false;   // true while the saved image is drawn
 
 /* ---------- state ---------- */
 
@@ -82,7 +85,7 @@ function saveState() {
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify({
       ids: G.ids, hang: G.hang, wall: G.wall, title: G.title, intro: G.intro, curator: G.curator,
-      showLabels: G.showLabels, showFigure: G.showFigure, showGuide: G.showGuide, salon: G.salon
+      showLabels: G.showLabels, showFigure: G.showFigure, showGuide: G.showGuide, salon: G.salon, snap: G.snap, z: G.z
     }));
   } catch (e) { /* storage unavailable: the wall just won't be remembered */ }
 }
@@ -94,7 +97,8 @@ function loadState() {
     const s = JSON.parse(raw);
     Object.assign(G, s);
     G.ids = (G.ids || []).filter(id => WORK_BY_ID.has(id)).slice(0, MAX_WORKS);
-    G.salon = G.salon || {};
+    G.salon = G.salon || {}; G.z = G.z || {};
+    if (G.snap === undefined) G.snap = true;
     return true;
   } catch (e) { return false; }
 }
@@ -146,6 +150,27 @@ function wallRehang() {
 }
 
 function wallSelect(id) { G.selected = id; for (const fn of wallChangeListeners) fn({ selected: id }); }
+
+function setSnap(on) {
+  G.snap = on;
+  if (on && G.hang === "salon") {
+    // tidy up: move overlapping works apart, in stacking order
+    for (const id of drawOrder()) resolveSalon(id);
+  }
+  wallChanged({});
+}
+
+let zCounter = 0;
+function bringToFront(id) {
+  for (const v of Object.values(G.z)) zCounter = Math.max(zCounter, v);
+  G.z[id] = ++zCounter;
+}
+
+// Works in the order they're drawn (later ones on top)
+function drawOrder() {
+  if (G.hang !== "salon") return G.ids.slice();
+  return G.ids.slice().sort((a, b) => (G.z[a] || 0) - (G.z[b] || 0));
+}
 
 /* ---------- salon packing ---------- */
 
@@ -416,18 +441,27 @@ function titleBlockLines(ctx) {
   const iFont = `400 {px} ${UI_FONT}`;
   const cFont = `italic 400 {px} ${UI_FONT}`;
   const out = [];
+  if (!G.title.trim() && exporting) return out.concat(introAndCurator(ctx, false));
   const t = G.title.trim() || "Your exhibition title";
   // wrapText measures at 100 px per inch of type size, so the width limit is in type sizes
   const tl = wrapText(ctx, t, tFont, TITLE_W / TITLE_SIZE);
   for (const line of tl) out.push({ text: line, size: TITLE_SIZE, lh: TITLE_SIZE * 1.0, font: tFont, ghost: !G.title.trim() });
+  return out.concat(introAndCurator(ctx, true));
+}
+
+function introAndCurator(ctx, afterTitle) {
+  const INTRO_SIZE = 0.8, CUR_SIZE = 0.7;
+  const iFont = `400 {px} ${UI_FONT}`;
+  const cFont = `italic 400 {px} ${UI_FONT}`;
+  const out = [];
   const intro = G.intro.trim();
   if (intro) {
-    out.push({ gap: 2.2 });
+    if (afterTitle) out.push({ gap: 2.2 });
     for (const line of wrapText(ctx, intro, iFont, (TITLE_W - 6) / INTRO_SIZE)) out.push({ text: line, size: INTRO_SIZE, lh: INTRO_SIZE * 1.5, font: iFont });
   }
   const cur = G.curator.trim();
   if (cur) {
-    out.push({ gap: intro ? 1.4 : 2.2 });
+    if (afterTitle || intro) out.push({ gap: intro ? 1.4 : 2.2 });
     out.push({ text: "Curated by " + cur, size: CUR_SIZE, lh: CUR_SIZE * 1.5, font: cFont });
   }
   return out;
@@ -499,7 +533,7 @@ const OKEEFFE_OUTLINE = [[2.22,65],[2.93,64.6],[2.93,64.5],[3.43,64.09],[3.73,63
 const OKEEFFE_GAPS = [[[-5.15,47.74],[-5.25,47.74],[-5.45,47.54],[-5.45,47.44],[-5.95,46.73],[-5.65,46.43],[-5.55,46.43],[-5.25,46.02],[-5.15,46.13],[-5.15,47.44],[-5.05,47.54]],[[-0.81,53.19],[-1.11,53.19],[-1.31,53.09],[-2.12,52.38],[-2.12,51.68],[-2.02,51.58],[-2.02,51.07],[-2.32,50.57],[-2.42,50.06],[-2.83,49.36],[-2.83,47.54],[-2.73,47.44],[-2.52,47.44],[-1.92,48.04],[-1.92,48.35],[-1.82,48.55],[-1.61,48.65],[-1.01,49.96],[-1.11,50.57],[-1.51,51.37],[-1.51,52.08],[-1.21,52.38],[-0.81,52.38],[-0.71,52.18],[-0.71,51.78],[-0.5,51.48],[-0.3,51.58],[-0.3,51.78],[-0.1,51.98],[-0.2,52.18],[-0.2,52.48],[-0.4,52.69],[-0.5,52.59],[-0.71,52.59],[-0.71,53.09]]];
 let figurePath = null;
 
-function drawFigure(ctx, ink, floorInk) {
+function drawFigure(ctx, ink, floorInk, uiPx) {
   if (!figurePath) {
     figurePath = new Path2D();
     for (const poly of [OKEEFFE_OUTLINE, ...OKEEFFE_GAPS]) {
@@ -514,8 +548,9 @@ function drawFigure(ctx, ink, floorInk) {
   ctx.fillStyle = rgba(ink, 0.30);
   ctx.fill(figurePath, "evenodd");
   ctx.restore();
-  if (FLOOR * view.s >= 15) {
-    ctx.font = `500 11px ${UI_FONT}`;
+  uiPx = uiPx || 11;
+  if (FLOOR * view.s >= uiPx + 4) {
+    ctx.font = `500 ${uiPx}px ${UI_FONT}`;
     ctx.fillStyle = floorInk;
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
     const label = "Georgia O'Keeffe, 5 ft 5 in";
@@ -585,12 +620,17 @@ function windowResized() { sizeCanvas(); }
 
 function draw() {
   if (!L) return;
-  const ctx = drawingContext;
   const k = reduceMotion ? 1 : 0.22;
   view.s += (tv.s - view.s) * k; view.ox += (tv.ox - view.ox) * k; view.oy += (tv.oy - view.oy) * k;
+  drawScene(drawingContext, width, height, null);
+}
 
-  const dark = isDarkTheme();
-  background(dark ? "#1F1D1B" : "#F2F0EC");
+// Draws the wall. ex = null for the live canvas; for the saved image, ex = {images, numbers, bg}
+// (uses the global view, so the export swaps it in temporarily).
+function drawScene(ctx, W, H, ex) {
+  const dark = !ex && isDarkTheme();
+  ctx.fillStyle = ex ? ex.bg : (dark ? "#1F1D1B" : "#F2F0EC");
+  ctx.fillRect(0, 0, W, H);
   const ink = wallInk();
 
   // wall, baseboard, floor
@@ -602,16 +642,17 @@ function draw() {
   ctx.fillStyle = floorCol; ctx.fillRect(wx0, wyFloor, wx1 - wx0, FLOOR * view.s);
   ctx.fillStyle = "rgba(0,0,0,0.12)"; ctx.fillRect(wx0, wyFloor, wx1 - wx0, Math.max(1, 0.4 * view.s));
   const floorInk = dark ? "rgba(239,237,234,0.75)" : "rgba(29,27,25,0.72)";
+  const uiPx = ex ? ex.uiPx : 11;
 
   // 60-inch line
   if (G.showGuide) {
     ctx.save();
-    ctx.strokeStyle = rgba(ink, 0.32); ctx.lineWidth = 1; ctx.setLineDash([6, 5]);
+    ctx.strokeStyle = rgba(ink, 0.32); ctx.lineWidth = ex ? 2 : 1; ctx.setLineDash(ex ? [12, 10] : [6, 5]);
     const gy = Math.round(toY(CENTER)) + 0.5;
     const gx0 = toX(L.title.x + TITLE_W + 2);   // the line starts after the title wall
     ctx.beginPath(); ctx.moveTo(gx0, gy); ctx.lineTo(wx1, gy); ctx.stroke();
     ctx.restore();
-    ctx.font = `600 11px ${UI_FONT}`; ctx.fillStyle = rgba(ink, 0.6);
+    ctx.font = `600 ${uiPx}px ${UI_FONT}`; ctx.fillStyle = rgba(ink, 0.6);
     ctx.textAlign = "left"; ctx.textBaseline = "bottom";
     const room = (TITLE_GAP - 4) * view.s - 6;
     let gl = G.hang === "line" ? "60 in on center" : "60 in";
@@ -622,28 +663,33 @@ function draw() {
   drawTitleBlock(ctx, ink);
 
   // works
-  const order = G.ids.filter(id => !drag || id !== drag.id);
-  if (drag) order.push(drag.id);
+  const order = drawOrder().filter(id => !drag || ex || id !== drag.id);
+  if (drag && !ex) order.push(drag.id);
+  const numbers = [];
   for (const id of order) {
     const t = L.items.get(id);
     if (!t) continue;
-    let d = disp.get(id);
-    if (!d) { d = { x: t.x, y: t.y + (reduceMotion ? 0 : 6), a: reduceMotion ? 1 : 0 }; disp.set(id, d); }
-    if (drag && drag.id === id && drag.moved) {
-      d.x = drag.x; d.y = G.hang === "line" ? t.y : drag.y;
-      if (G.hang === "line") d.y += (t.y - d.y) * 0.3;
-    } else {
-      const kk = reduceMotion ? 1 : 0.25;
-      d.x += (t.x - d.x) * kk; d.y += (t.y - d.y) * kk;
+    let d;
+    if (ex) d = { x: t.x, y: t.y, a: 1 };
+    else {
+      d = disp.get(id);
+      if (!d) { d = { x: t.x, y: t.y + (reduceMotion ? 0 : 6), a: reduceMotion ? 1 : 0 }; disp.set(id, d); }
+      if (drag && drag.id === id && drag.moved) {
+        d.x = drag.x; d.y = G.hang === "line" ? t.y : drag.y;
+        if (G.hang === "line") d.y += (t.y - d.y) * 0.3;
+      } else {
+        const kk = reduceMotion ? 1 : 0.25;
+        d.x += (t.x - d.x) * kk; d.y += (t.y - d.y) * kk;
+      }
+      d.a = Math.min(1, d.a + (reduceMotion ? 1 : 0.08));
     }
-    d.a = Math.min(1, d.a + (reduceMotion ? 1 : 0.08));
     const work = WORK_BY_ID.get(id);
     const rx = toX(d.x), ry = toY(d.y + t.h), rw = t.w * view.s, rh = t.h * view.s;
-    if (rx > width + 50 || rx + rw < -50) continue;
+    if (rx > W + 50 || rx + rw < -50) continue;
 
     ctx.save();
     ctx.globalAlpha = d.a;
-    const lifted = drag && drag.id === id && drag.moved;
+    const lifted = !ex && drag && drag.id === id && drag.moved;
     ctx.shadowColor = `rgba(0,0,0,${lifted ? 0.38 : 0.26})`;
     ctx.shadowBlur = Math.max(2, (lifted ? 3 : 1.4) * view.s);
     ctx.shadowOffsetY = Math.max(1, (lifted ? 1.2 : 0.5) * view.s);
@@ -653,7 +699,7 @@ function draw() {
 
     ctx.save();
     ctx.globalAlpha = d.a;
-    const img = imageFor(work, rw, rh);
+    const img = ex ? ex.images.get(id) : imageFor(work, rw, rh);
     if (img && img.naturalWidth) {
       const ia = img.naturalWidth / img.naturalHeight, ra = t.w / t.h;
       if (Math.abs(ia / ra - 1) < 0.08) ctx.drawImage(img, rx, ry, rw, rh);
@@ -664,7 +710,7 @@ function draw() {
     }
     ctx.restore();
 
-    if (G.selected === id || hoverId === id) {
+    if (!ex && (G.selected === id || hoverId === id)) {
       ctx.save();
       ctx.strokeStyle = G.selected === id ? (hexLum(G.wall) > 0.33 ? "#B8432A" : "#F0A58F") : rgba(ink, 0.55);
       ctx.lineWidth = G.selected === id ? 2 : 1;
@@ -673,21 +719,32 @@ function draw() {
       ctx.restore();
     }
 
-    if (G.hang === "line" && G.showLabels && !(drag && drag.id === id && drag.moved)) {
+    if (G.hang === "line" && G.showLabels && !(drag && !ex && drag.id === id && drag.moved)) {
       const lb = L.labels.get(id);
       if (lb) drawLabel(ctx, work, { x: d.x + t.w + LABEL_GAP, y: lb.y, w: lb.w, h: lb.h }, ink);
     }
+    if (ex && ex.numbers) numbers.push({ n: G.ids.indexOf(id) + 1, x: rx, y: ry + rh });
   }
 
-  if (!G.ids.length) {
-    ctx.font = `500 ${width < 600 ? 13 : 15}px ${UI_FONT}`;
+  // checklist numbers on the saved image, drawn last so none are covered
+  for (const nb of numbers) {
+    // a small square just below the work's lower-left corner, so it never covers the image
+    const sz = Math.round(uiPx * 1.5), gap = Math.round(uiPx * 0.35);
+    ctx.fillStyle = "#171615"; ctx.fillRect(nb.x, nb.y + gap, sz, sz);
+    ctx.fillStyle = "#FFFFFF"; ctx.font = `700 ${Math.round(uiPx * 0.95)}px ${UI_FONT}`;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(String(nb.n), nb.x + sz / 2, nb.y + gap + sz / 2 + 1);
+  }
+
+  if (!G.ids.length && !ex) {
+    ctx.font = `500 ${W < 600 ? 13 : 15}px ${UI_FONT}`;
     ctx.fillStyle = rgba(ink, 0.6);
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
     const hx = toX(L.title.x + TITLE_W + TITLE_GAP + 60);
-    ctx.fillText(width < 600 ? "Choose works below" : "Choose works to hang them here", hx, toY(CENTER + 14));
+    ctx.fillText(W < 600 ? "Choose works below" : "Choose works to hang them here", hx, toY(CENTER + 14));
   }
 
-  if (G.showFigure) drawFigure(ctx, ink, floorInk);
+  if (G.showFigure) drawFigure(ctx, ink, floorInk, uiPx);
 }
 
 /* ---------- interaction ---------- */
@@ -698,7 +755,7 @@ function localPoint(e) {
 }
 
 function hitTest(px, py) {
-  const order = G.ids.slice().reverse();
+  const order = drawOrder().reverse();
   for (const id of order) {
     const t = L.items.get(id), d = disp.get(id) || t;
     if (!t) continue;
@@ -768,7 +825,7 @@ function onPointerMove(e) {
 function onPointerUp(e) {
   if (drag) {
     const wasMoved = drag.moved, id = drag.id;
-    if (G.hang === "salon" && wasMoved) resolveSalon(id);
+    if (G.hang === "salon" && wasMoved) { if (G.snap) resolveSalon(id); else bringToFront(id); }
     drag = null;
     frozenOffset = null;
     cnv.elt.style.cursor = "grab";
@@ -811,8 +868,8 @@ function onKey(e) {
     const dy = e.key === "ArrowUp" ? step : e.key === "ArrowDown" ? -step : 0;
     if (dx || dy) {
       e.preventDefault();
-      p.x += dx; p.y += dy;
-      resolveSalon(id);
+      p.x += dx; p.y = Math.max(G.ids && WORK_BY_ID.get(id).h / 2, p.y + dy);
+      if (G.snap) resolveSalon(id);
       wallChanged({ moved: id });
     }
   }

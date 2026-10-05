@@ -8,7 +8,8 @@ Drag this whole folder onto Netlify (or upload the files to the p5 web editor).
 - `colors.js`: Jonathan's ColorGrid color utilities, unchanged
 - `works.js`: loads and normalizes `paintings.json` (adapted from ColorGrid's museum.js)
 - `wall.js`: the p5 sketch: the wall, to-scale hanging, salon packing, dragging
-- `ui.js`: the controls (color and subject picker, wall color, title wall, list of works)
+- `share.js`: Save as image (poster PNG), Copy checklist, and Copy link
+- `ui.js`: the controls (color and subject picker, wall color, title wall, Exhibition Checklist)
 - `paintings.json`: Jonathan's 500 search-index records, trimmed to the fields used
 
 ## Data
@@ -24,7 +25,17 @@ for example the 1,265-work best-images file from Eye for O'Keeffe. No code chang
 - Eye level: centered 60 in from the floor (`CENTER`), 24 in apart (`GAP_LINE`); a work that
   would come within 10 in of the floor is raised.
 - Salon: 3 in apart (`GAP_SALON`), largest works placed first, packed around the 60 in line.
+  With "Snap into place" off, works stay exactly where they're dropped and may overlap.
 - Wall is at least 12 ft high and grows for tall work. O'Keeffe's silhouette is 5 ft 5 in.
 
 Images load from IIIF and are drawn straight onto the canvas (no CORS needed). If an image
 can't load, the work shows as bands of its color tags at its true size.
+
+## Sharing
+
+- Save as image: a 2400 px wide PNG with the title, introduction, the wall to scale with numbered
+  works, and the Exhibition Checklist. IIIF images are loaded with CORS for this; any image that
+  won't load that way is drawn as color bands.
+- Copy checklist: plain text of the title, introduction, and checklist.
+- Copy link: the whole exhibition is packed into `?wall=...` in the link. No server needed.
+  Opening the link loads that exhibition; changes stay on the visitor's device.
