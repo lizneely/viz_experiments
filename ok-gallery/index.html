@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Curate Your Own Gallery</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap">
+<style>
+/* Gallery-wall look, shared with the O'Keeffe Experiments index */
+:root{--bg:#FFFFFF;--fg:#171615;--muted:#5F5A54;--line:#DEDAD4;--paper:#F2F0EC;--band:#171615;--band-fg:#F3F1EE;--accent:#B8432A;
+  --sans:"Schibsted Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --ground:var(--bg);--ink:var(--fg);--ink2:#3E3A36;--ink3:var(--muted);--rule:var(--line);--g:var(--accent)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#141312;--fg:#EFEDEA;--muted:#A9A39C;--line:#2F2C29;--paper:#1F1D1B;--band:#0A0A09;--ink2:#CFCAC4;--accent:#E07A5F}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#141312;--fg:#EFEDEA;--muted:#A9A39C;--line:#2F2C29;--paper:#1F1D1B;--band:#0A0A09;--ink2:#CFCAC4;--accent:#E07A5F}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg);color:var(--fg);font-family:var(--sans)}
+body{margin:0}
+button,input,textarea{font:inherit;color:inherit}
+.lab{background:var(--band);color:var(--band-fg)}
+.lab-in{max-width:1200px;margin:0 auto;padding-inline:20px;padding-block:14px;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 24px}
+.lab-brand{font-weight:700;font-size:17px;letter-spacing:-.01em;white-space:nowrap}
+.lab-note{font-size:13.5px;line-height:1.45;opacity:.85;max-width:80ch}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:20px;padding-block:56px 24px}
+.intro{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px 56px;align-items:end;padding-bottom:32px;margin-bottom:28px;border-bottom:1px solid var(--fg)}
+h1{margin:0;font-weight:800;font-size:clamp(44px,7.4vw,96px);line-height:.94;letter-spacing:-.035em;text-wrap:balance}
+.lede{margin:0;font-size:17px;line-height:1.55;max-width:52ch}
+:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+
+/* studio: controls on the left, the wall on the right */
+.studio{display:grid;grid-template-columns:340px minmax(0,1fr);gap:36px;align-items:start}
+.stage{position:sticky;top:12px;min-width:0}
+.controls{min-width:0}
+.step{border-top:1px solid var(--line);padding:18px 0 22px}
+.step:first-child{border-top:0;padding-top:0}
+.step h2{margin:0 0 12px;font-size:19px;font-weight:700;letter-spacing:-.01em;display:flex;gap:10px;align-items:baseline}
+.step h2 .num{font-weight:800;color:var(--muted)}
+.sub{margin:14px 0 8px;font-size:13px;font-weight:600}
+.note{margin:8px 0 0;font-size:12.5px;line-height:1.5;color:var(--muted)}
+
+.tabs{display:flex;border:1px solid var(--fg);margin-bottom:12px}
+.tab{flex:1;background:transparent;border:0;padding:9px 10px;font-weight:600;font-size:14px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--fg);color:var(--bg)}
+
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(30px,1fr));gap:5px}
+.swatch{aspect-ratio:1;border:1px solid rgba(0,0,0,.14);background:var(--c);cursor:pointer;padding:0}
+.swatch[aria-pressed="true"]{outline:2px solid var(--fg);outline-offset:2px}
+.chips{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+.chip{display:flex;justify-content:space-between;gap:12px;background:transparent;border:0;border-bottom:1px solid var(--line);padding:8px 2px;text-align:left;cursor:pointer;font-size:14px}
+.chip .n{color:var(--muted);font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{font-weight:700}
+.chip[aria-pressed="true"] .n{color:var(--fg)}
+.chip:hover span:first-child{text-decoration:underline;text-underline-offset:3px}
+
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:14px 0 10px;font-size:13px}
+.filters .count{color:var(--muted);margin-right:4px}
+.filters button{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--fg);background:transparent;padding:4px 8px;font-size:13px;cursor:pointer}
+.filters button i{width:12px;height:12px;border:1px solid rgba(0,0,0,.15);display:inline-block}
+
+.results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 8px;max-height:520px;overflow:auto;padding:2px 2px 4px}
+.result{display:flex;flex-direction:column;gap:6px;text-align:left;background:transparent;border:0;padding:0;cursor:pointer;position:relative}
+.result .rt{display:flex;flex-direction:column;gap:1px;font-size:12px;line-height:1.3}
+.result .rt em{font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.result .rt span{color:var(--muted)}
+.result .tick{position:absolute;top:6px;right:6px;font-size:11.5px;font-weight:700;background:var(--bg);color:var(--fg);padding:3px 6px;opacity:0;transition:opacity .15s}
+.result:hover .tick,.result:focus-visible .tick{opacity:1}
+.result.on .tick{opacity:1;background:var(--fg);color:var(--bg)}
+.result.on .thumb{outline:2px solid var(--fg);outline-offset:2px}
+.empty{font-size:13.5px;color:var(--muted);grid-column:1/-1}
+.thumb{position:relative;display:block;aspect-ratio:1;background:var(--paper);overflow:hidden}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:var(--paper)}
+.bands{position:absolute;inset:14%;display:flex}
+.bands i{flex:1}
+.bands.none{background:repeating-linear-gradient(135deg,#D9D2C6 0 6px,#CFC7B9 6px 7px)}
+
+.btn-line,.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--fg);background:transparent;padding:8px 12px;font-weight:600;font-size:13.5px;cursor:pointer;line-height:1.1}
+.btn-line:disabled{opacity:.35;cursor:default}
+.btn{background:var(--fg);color:var(--bg)}
+#more{margin-top:12px;width:100%}
+
+.wallswatches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.wallswatch{height:34px;border:1px solid rgba(0,0,0,.14);background:var(--c);cursor:pointer;padding:0}
+.wallswatch[aria-pressed="true"],.custom.on{outline:2px solid var(--fg);outline-offset:2px}
+.custom{grid-column:1/-1;display:flex;align-items:center;gap:10px;font-size:13.5px;cursor:pointer;padding:4px 0}
+.custom input{width:44px;height:30px;padding:0;border:1px solid var(--line);background:transparent;cursor:pointer}
+.radios,.checks{display:flex;flex-direction:column;gap:8px;font-size:14px}
+.radios label,.checks label{display:flex;gap:9px;align-items:flex-start;cursor:pointer;line-height:1.35}
+.radios input,.checks input{margin:2px 0 0;accent-color:var(--fg);width:16px;height:16px;flex:none}
+.radios small{display:block;color:var(--muted);font-size:12.5px}
+.checks label.off{opacity:.45}
+
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;font-size:13px;font-weight:600}
+.field input,.field textarea{border:1px solid var(--line);background:var(--bg);padding:9px 10px;font-size:15px;font-weight:400;border-radius:0;width:100%}
+.field input:focus,.field textarea:focus{border-color:var(--fg);outline:none}
+.field textarea{min-height:96px;resize:vertical;line-height:1.45}
+.field small{font-weight:400;color:var(--muted)}
+
+.onwall{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.onwall li{display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--line);padding:6px 0}
+.onwall li.sel .ow-main em{text-decoration:underline;text-underline-offset:3px}
+.ow-main{flex:1;min-width:0;display:flex;gap:10px;align-items:center;background:transparent;border:0;padding:0;text-align:left;cursor:pointer;font-size:13px;line-height:1.3}
+.ow-main .thumb{width:40px;flex:none}
+.ow-main > span{display:flex;flex-direction:column;min-width:0}
+.ow-main em{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ow-main > span > span{color:var(--muted)}
+.ic{width:30px;height:30px;flex:none;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:15px;line-height:1}
+.ic:hover:not(:disabled){border-color:var(--fg)}
+.ic:disabled{opacity:.3;cursor:default}
+#on-wall-empty{font-size:13.5px;color:var(--muted);margin:0}
+#clear-wall{margin-top:12px}
+
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;font-size:13px}
+#wall-stats{color:var(--muted);font-variant-numeric:tabular-nums}
+.tools{display:flex;gap:6px}
+.tools .btn-line{padding:6px 10px;min-width:34px}
+#wall-holder{width:100%;background:var(--paper);touch-action:none;line-height:0}
+#wall-holder canvas{display:block}
+.hint{margin:8px 0 0;font-size:12.5px;color:var(--muted);line-height:1.45}
+#img-note{margin:8px 0 0;font-size:12.5px;line-height:1.45;border-left:3px solid var(--fg);padding-left:10px}
+#flash{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 14px;font-size:13.5px;z-index:20;max-width:calc(100% - 32px)}
+#loading{font-size:14px;color:var(--muted);margin:10px 0}
+
+.card{display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.card .thumb{width:120px}
+.card h3{margin:0 0 6px;font-size:17px;font-weight:600;line-height:1.3}
+.card p{margin:0 0 4px;font-size:13.5px;line-height:1.45}
+.card .muted{color:var(--muted)}
+.card a{color:inherit;text-underline-offset:3px}
+.card-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.credit{font-size:12.5px;color:var(--muted);margin:14px 0 0;line-height:1.5}
+
+@media (max-width:900px){
+  .studio{grid-template-columns:1fr;gap:20px}
+  .stage{position:static;order:-1}
+  .results{max-height:440px;grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:820px){.intro{grid-template-columns:1fr}.wrap{padding-block:40px 24px}}
+@media (max-width:520px){
+  .results{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .card{grid-template-columns:84px minmax(0,1fr)}.card .thumb{width:84px}
+}
+</style>
+
+</head>
+<body>
+<div class="lab" role="note" aria-label="About this prototype">
+  <div class="lab-in">
+    <div class="lab-brand">O'Keeffe Experiments</div>
+    <div class="lab-note">The following prototype is for experimental purposes and is using information that has not been reviewed.</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="intro">
+    <h1>Curate Your Own Gallery</h1>
+    <p class="lede">Choose works by Georgia O'Keeffe by color or subject, paint the wall, and write the title wall for your exhibition. Every work hangs at its true size, centered 60 inches from the floor, or try a salon hang. Drag works to rearrange them.</p>
+  </div>
+
+  <div class="studio">
+    <div class="controls">
+      <section class="step" aria-labelledby="s1">
+        <h2 id="s1"><span class="num">1</span> Choose works</h2>
+        <div class="tabs" role="tablist" aria-label="Browse by">
+          <button type="button" class="tab" role="tab" data-tab="color" aria-selected="true" aria-controls="panel-color">By color</button>
+          <button type="button" class="tab" role="tab" data-tab="subject" aria-selected="false" aria-controls="panel-subject">By subject</button>
+        </div>
+        <div id="panel-color" role="tabpanel">
+          <div class="swatches" id="color-swatches"></div>
+          <p class="note">Each swatch is a color tag from the collection records. Pick one to see the works tagged with it.</p>
+        </div>
+        <div id="panel-subject" role="tabpanel" hidden>
+          <div class="chips" id="subject-list"></div>
+        </div>
+        <div class="filters" id="active-filters" aria-live="polite"></div>
+        <p id="loading">Loading the collection…</p>
+        <div class="results" id="results"></div>
+        <button type="button" class="btn-line" id="more" hidden>Show more</button>
+        <p class="credit">Color browsing is adapted from Jonathan's ColorGrid sketch.</p>
+      </section>
+
+      <section class="step" aria-labelledby="s2">
+        <h2 id="s2"><span class="num">2</span> Set the wall</h2>
+        <div class="sub">Wall color</div>
+        <div class="wallswatches" id="wall-colors"></div>
+        <div class="sub">Hang</div>
+        <div class="radios" role="radiogroup" aria-label="Hang">
+          <label><input type="radio" name="hang" value="line" checked><span>Eye level<small>One row, each work centered 60 inches from the floor</small></span></label>
+          <label><input type="radio" name="hang" value="salon"><span>Salon<small>Works grouped close together around eye level</small></span></label>
+        </div>
+        <div class="sub">Show</div>
+        <div class="checks">
+          <label><input type="checkbox" id="opt-labels" checked><span>Wall labels</span></label>
+          <label><input type="checkbox" id="opt-figure" checked><span>O'Keeffe for scale (5 ft 5 in)</span></label>
+          <label><input type="checkbox" id="opt-guide" checked><span>The 60-inch line</span></label>
+        </div>
+      </section>
+
+      <section class="step" aria-labelledby="s3">
+        <h2 id="s3"><span class="num">3</span> Write the title wall</h2>
+        <label class="field">Exhibition title<input id="t-title" type="text" maxlength="80" placeholder="Your exhibition title" autocomplete="off"></label>
+        <label class="field">Introduction <small>A few sentences about your exhibition</small><textarea id="t-intro" maxlength="700"></textarea></label>
+        <label class="field">Curated by<input id="t-curator" type="text" maxlength="60" autocomplete="off"></label>
+      </section>
+
+      <section class="step" aria-labelledby="s4">
+        <h2 id="s4">On the wall <span id="on-wall-count" class="num"></span></h2>
+        <ol class="onwall" id="on-wall"></ol>
+        <p id="on-wall-empty">No works yet.</p>
+        <button type="button" class="btn-line" id="clear-wall" hidden>Clear the wall</button>
+      </section>
+    </div>
+
+    <div class="stage">
+      <div class="toolbar">
+        <span id="wall-stats" aria-live="polite"></span>
+        <div class="tools">
+          <button type="button" class="btn-line" id="rehang" hidden>Re-hang</button>
+          <button type="button" class="btn-line" id="zoom-out" aria-label="Zoom out">−</button>
+          <button type="button" class="btn-line" id="zoom-fit">Fit</button>
+          <button type="button" class="btn-line" id="zoom-in" aria-label="Zoom in">+</button>
+        </div>
+      </div>
+      <div id="wall-holder"></div>
+      <p class="hint" id="drag-hint"></p>
+      <p id="img-note" hidden>Images can't load in this preview, so each work appears as bands of its color tags, at its true size. Open the hosted prototype to see the works themselves.</p>
+      <div class="card" id="card" hidden></div>
+    </div>
+  </div>
+</div>
+<div id="flash" role="status" aria-live="polite" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<script src="colors.js"></script>
+<script src="works.js"></script>
+<script src="wall.js"></script>
+<script src="ui.js"></script>
+
+<!-- O'Keeffe Experiments: shared banner + footer (v4, gallery-wall look).
+     Paste this whole block just before </body> in any prototype's index.html.
+     It replaces any earlier version (v1–v3): delete that one first.
+
+     It does three things:
+     1. Restyles the O'Keeffe Experiments banner in the new look (black bar, one sans
+        typeface, no badge or dot) and adds "All prototypes" without making it taller.
+     2. Sets the footer text and adds a "Share your feedback" button. If the page already
+        has a footer note (class "fine"), its text is replaced; if not, a footer is added.
+     3. Loads the typeface it needs, so it works on pages that haven't been restyled yet.
+
+     To change the footer wording or links later, edit the three lines marked EDIT below. -->
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400;0,600;0,700;1,400&display=swap");
+
+  /* Banner, new look */
+  .okx-banner { font-family: "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif; align-items: baseline; }
+  .lab:has(.okx-banner) { background: #171615; color: #F3F1EE; }
+  .okx-banner .lab-mark, .okx-banner .lab-pill { display: none; }
+  .okx-banner .lab-brand { font-family: inherit; font-weight: 700; font-size: 17px; letter-spacing: -.01em; }
+  .okx-banner .lab-brand em { font-style: normal; font-weight: inherit; }
+  .okx-banner .lab-note { font-size: 13.5px; opacity: .85; flex: 1 1 320px; min-width: 0; }
+
+  /* "All prototypes" link */
+  .okx-home {
+    flex: none; display: inline-flex; align-items: center; gap: 8px; margin-left: auto; align-self: center;
+    font: 600 13.5px/1 "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: inherit; text-decoration: none; white-space: nowrap;
+    border: 1px solid currentColor; padding: 7px 11px;
+  }
+  .okx-home svg { width: 11px; height: 11px; flex: none; }
+  .okx-home:hover { background: #F3F1EE; color: #171615; }
+  .okx-home:focus-visible, .okx-feedback:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+  @media (max-width: 760px) {
+    .okx-banner .okx-home { order: 1; padding: 5px 9px; }
+    .okx-banner .lab-note { order: 2; flex-basis: 100%; }
+  }
+  @media (max-width: 480px) {
+    .okx-home .okx-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+  .okx-bar { background: #171615; color: #F3F1EE; padding: 10px 20px; display: flex; }
+
+  /* Footer */
+  .okx-footer { max-width: 1200px; margin: 0 auto; padding: 24px 20px 56px; }
+  .okx-footer-in { display: grid; gap: 14px; justify-items: start; }
+  .okx-fine {
+    margin: 0; max-width: 80ch;
+    font: 13px/1.55 "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: var(--muted, var(--ink3, #6B655E));
+  }
+  .okx-fine em { font-style: italic; }
+  .okx-feedback {
+    display: inline-block;
+    font: 600 14.5px/1 "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--fg, var(--ink, #171615)); color: var(--bg, var(--paper, #FFFFFF));
+    text-decoration: none; padding: 12px 16px;
+  }
+  .okx-feedback:hover { opacity: .85; }
+</style>
+<a class="okx-home" href="https://okeeffe-experiments.netlify.app/" title="All O'Keeffe Experiments prototypes">
+  <svg viewBox="0 0 12 12" aria-hidden="true"><g fill="currentColor"><rect x="0" y="0" width="5" height="5"/><rect x="7" y="0" width="5" height="5"/><rect x="0" y="7" width="5" height="5"/><rect x="7" y="7" width="5" height="5"/></g></svg>
+  <span class="okx-label">All prototypes</span>
+</a>
+<script>
+  (function () {
+    // EDIT: footer text (HTML is allowed, e.g. <em>)
+    var FOOTER_TEXT = "O'Keeffe Experiments is from the Digital Experience team at the Georgia O'Keeffe Museum. These prototypes use data and images from <em>Access O'Keeffe</em>, including the catalogue raisonné, along with some subject information added with the help of AI. Because these are prototypes, the data and images have not been reviewed for publication in this format.";
+    // EDIT: feedback form link and its label
+    var FEEDBACK_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdsjmbq0M56niYfdl4N5c52cS8dOA0HCDvSLCFJTwfPspdQbg/viewform?usp=publish-editor";
+    var FEEDBACK_LABEL = "Share your feedback";
+
+    // 1. Banner
+    var link = document.currentScript.previousElementSibling;
+    var banner = document.querySelector(".lab-in");
+    if (banner) {
+      banner.classList.add("okx-banner");
+      banner.appendChild(link);
+    } else {
+      var bar = document.createElement("div");
+      bar.className = "okx-bar";
+      bar.appendChild(link);
+      document.body.insertBefore(bar, document.body.firstChild);
+    }
+
+    // 2. Footer
+    var feedback = document.createElement("a");
+    feedback.className = "okx-feedback";
+    feedback.href = FEEDBACK_URL;
+    feedback.target = "_blank";
+    feedback.rel = "noopener";
+    feedback.textContent = FEEDBACK_LABEL;
+
+    var existing = document.querySelector("footer .fine") || document.querySelector(".foot .fine");
+    if (existing) {
+      existing.innerHTML = FOOTER_TEXT;
+      existing.insertAdjacentElement("afterend", feedback);
+      feedback.style.marginTop = "14px";
+    } else {
+      var footer = document.createElement("footer");
+      footer.className = "okx-footer";
+      footer.innerHTML = '<div class="okx-footer-in"><p class="okx-fine"></p></div>';
+      footer.querySelector(".okx-fine").innerHTML = FOOTER_TEXT;
+      footer.firstChild.appendChild(feedback);
+      // Line the footer up with the banner's content width
+      if (banner) footer.style.maxWidth = getComputedStyle(banner).maxWidth;
+      document.body.appendChild(footer);
+      // p5 may add its canvas to the end of the page after this runs; keep the footer last.
+      window.addEventListener("load", function () {
+        setTimeout(function () { document.body.appendChild(footer); }, 300);
+      });
+    }
+  })();
+</script>
+
+
+</body>
+</html>
