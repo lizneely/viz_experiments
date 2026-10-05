@@ -113,6 +113,8 @@ h1{margin:0;font-weight:800;font-size:clamp(44px,7.4vw,96px);line-height:.94;let
 #wall-stats{color:var(--muted);font-variant-numeric:tabular-nums}
 .tools{display:flex;gap:6px}
 .tools .btn-line{padding:6px 10px;min-width:34px}
+.tools{flex-wrap:wrap;justify-content:flex-end}
+#start-over.armed{background:var(--fg);color:var(--bg)}
 #wall-holder{width:100%;background:var(--paper);touch-action:none;line-height:0}
 #wall-holder canvas{display:block}
 .hint{margin:8px 0 0;font-size:12.5px;color:var(--muted);line-height:1.45}
@@ -240,6 +242,7 @@ h1{margin:0;font-weight:800;font-size:clamp(44px,7.4vw,96px);line-height:.94;let
       <div class="toolbar">
         <span id="wall-stats" aria-live="polite"></span>
         <div class="tools">
+          <button type="button" class="btn-line" id="start-over" title="Take every work down and clear the title wall">Start over</button>
           <button type="button" class="btn-line" id="rehang" hidden>Re-hang</button>
           <button type="button" class="btn-line" id="zoom-out" aria-label="Zoom out">−</button>
           <button type="button" class="btn-line" id="zoom-fit">Fit</button>

@@ -33,9 +33,15 @@ can't load, the work shows as bands of its color tags at its true size.
 
 ## Sharing
 
-- Save as image: a 2400 px wide PNG with the title, introduction, the wall to scale with numbered
+- Save as image: a 2400 px wide PNG (no 60 in guide line) with the title, introduction, the wall to scale with numbered
   works, and the Exhibition Checklist. IIIF images are loaded with CORS for this; any image that
   won't load that way is drawn as color bands.
 - Copy checklist: plain text of the title, introduction, and checklist.
 - Copy link: the whole exhibition is packed into `?wall=...` in the link. No server needed.
   Opening the link loads that exhibition; changes stay on the visitor's device.
+
+## Starting over
+
+The wall is remembered in the visitor's browser. "Start over" (above the wall, click twice to
+confirm) takes every work down, clears the title wall, resets the wall color and hang, and
+forgets the saved copy. "Clear the wall" in the Exhibition Checklist removes only the works.

@@ -168,6 +168,25 @@ function buildWallControls() {
     clearArmed = setTimeout(() => { clearArmed = null; btn.textContent = "Clear the wall"; }, 4000);
   });
 
+  // Start over, also two-step
+  let resetArmed = null;
+  const resetBtn = $("#start-over");
+  const disarm = () => { clearTimeout(resetArmed); resetArmed = null; resetBtn.textContent = "Start over"; resetBtn.classList.remove("armed"); };
+  resetBtn.addEventListener("click", () => {
+    if (resetArmed) {
+      disarm();
+      F.color = null; F.subject = null; F.shown = RESULTS_PAGE;
+      $("#results").scrollTop = 0;
+      $("#share-text").hidden = true;
+      wallStartOver();
+      flash("Starting fresh: a blank wall and an empty checklist.");
+      return;
+    }
+    resetBtn.textContent = "Click again to start over";
+    resetBtn.classList.add("armed");
+    resetArmed = setTimeout(disarm, 4000);
+  });
+
   $("#on-wall").addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
     const id = +b.closest("li").dataset.id;

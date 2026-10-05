@@ -127,6 +127,17 @@ function wallClear() {
   wallChanged({ refit: true });
 }
 
+// Start over: every work down, title wall blank, wall and hang back to the defaults,
+// and the saved copy in this browser forgotten.
+const G_DEFAULTS = { hang: "line", wall: "#EAE3D4", title: "", intro: "", curator: "", showLabels: true, showFigure: true, showGuide: true, snap: true };
+function wallStartOver() {
+  Object.assign(G, G_DEFAULTS, { ids: [], salon: {}, z: {}, selected: null });
+  disp.clear();
+  userZoomed = false;
+  try { localStorage.removeItem(STORE_KEY); } catch (e) { /* nothing saved */ }
+  wallChanged({ refit: true, reset: true });
+}
+
 function wallMove(id, dir) {
   const i = G.ids.indexOf(id), j = i + dir;
   if (i < 0 || j < 0 || j >= G.ids.length) return;
@@ -645,7 +656,7 @@ function drawScene(ctx, W, H, ex) {
   const uiPx = ex ? ex.uiPx : 11;
 
   // 60-inch line
-  if (G.showGuide) {
+  if (G.showGuide && !ex) {   // the 60-inch line is a hanging aid, so it stays off the saved image
     ctx.save();
     ctx.strokeStyle = rgba(ink, 0.32); ctx.lineWidth = ex ? 2 : 1; ctx.setLineDash(ex ? [12, 10] : [6, 5]);
     const gy = Math.round(toY(CENTER)) + 0.5;
