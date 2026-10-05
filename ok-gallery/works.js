@@ -81,7 +81,10 @@ function normalizeWork(hit) {
     iw: Number(v.width) || w,
     ih: Number(v.height) || h,
     colors,
-    year: parseInt(String(date).match(/\d{4}/) || "0", 10) || 9999
+    year: parseInt(String(date).match(/\d{4}/) || "0", 10) || 9999,
+    // from the Museum's best-images list (Eye for O'Keeffe data), when present
+    alt: ((s.best_image || {}).alt_text || "").trim(),
+    credit: ((s.best_image || {}).credit || "").trim()
   };
 }
 

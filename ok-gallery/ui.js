@@ -44,8 +44,8 @@ function colorBandsHTML(work) {
   return '<span class="bands">' + work.colors.map(c => `<i style="background:${c.hex}"></i>`).join("") + "</span>";
 }
 
-function thumbHTML(work, size) {
-  return `<span class="thumb">${colorBandsHTML(work)}<img alt="" loading="lazy" decoding="async" src="${IIIF_URL(work.dam, size, size)}" onerror="this.remove()"></span>`;
+function thumbHTML(work, size, alt) {
+  return `<span class="thumb">${colorBandsHTML(work)}<img alt="${esc(alt || "")}" loading="lazy" decoding="async" src="${IIIF_URL(work.dam, size, size)}" onerror="this.remove()"></span>`;
 }
 
 /* ---------- step 1: choose works ---------- */
@@ -267,12 +267,14 @@ function renderCard() {
   const w = WORK_BY_ID.get(id), i = G.ids.indexOf(id), line = G.hang === "line";
   card.hidden = false;
   card.innerHTML = `
-    ${thumbHTML(w, 400)}
+    ${thumbHTML(w, 400, w.alt)}
     <div class="card-body">
       <h3><em>${esc(w.title)}</em>, ${esc(w.date)}</h3>
       <p>${esc(w.mediumDim || (w.medium + ", " + w.extent))}</p>
       ${w.owner ? `<p class="muted">${esc(w.owner)}</p>` : ""}
       <p class="muted">${w.subject ? "Subject: " + esc(w.subject) : ""}${w.colors.length ? `${w.subject ? " · " : ""}Colors: ${w.colors.map(c => esc(c.label)).join(", ")}` : ""}</p>
+      ${w.alt ? `<details class="desc"><summary>Image description</summary><p>${esc(w.alt)}</p></details>` : ""}
+      ${w.credit ? `<p class="muted small">${/^(photo|courtesy|image)/i.test(w.credit) ? "" : "Photo: "}${esc(w.credit)}</p>` : ""}
       <p><a href="${ACCESS_URL(w.id)}" target="_blank" rel="noopener">View on <em>Access O'Keeffe</em> ↗</a></p>
       <div class="card-actions">
         ${line ? `<button type="button" class="btn-line" data-act="up" ${i <= 0 ? "disabled" : ""}>← Move earlier</button>

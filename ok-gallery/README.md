@@ -10,15 +10,16 @@ Drag this whole folder onto Netlify (or upload the files to the p5 web editor).
 - `wall.js`: the p5 sketch: the wall, to-scale hanging, salon packing, dragging
 - `share.js`: Save as image (poster PNG), Copy checklist, and Copy link
 - `ui.js`: the controls (color and subject picker, wall color, title wall, Exhibition Checklist)
-- `paintings.json`: Jonathan's 500 search-index records, trimmed to the fields used
+- `paintings.json`: the 1,265 best-images records from Eye for O'Keeffe (search index plus the Museum's
+  best image, alt text, and photo credit for each work), trimmed to the fields used
 
 ## Data
 
-386 works are hung: 2D works with dimensions and an image. Sculpture, casts, stoneware,
+1,251 works can be hung: 2D works with dimensions and an image; 1,137 have color tags. Sculpture, casts, stoneware,
 sketchbooks, and works with known dimension conflicts are left out (see `works.js`).
 
 To use more works, replace `paintings.json` with any file in the same search-index shape,
-for example the 1,265-work best-images file from Eye for O'Keeffe. No code changes needed.
+for example an untrimmed export. No code changes needed.
 
 ## Hanging rules (in `wall.js`)
 
