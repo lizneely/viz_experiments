@@ -62,6 +62,10 @@ function prepareWorks(parsed) {
         (Array.isArray(s.controlling_institution) && s.controlling_institution[0]
           ? s.controlling_institution[0].name : "");
       p.imageNum = view.image_num || null;
+      // Best image and its alt text, from the Museum's best-images list (added to paintings.json)
+      p.altText = (s.best_image && s.best_image.alt_text) || "";
+      p.imageCredit = (s.best_image && s.best_image.credit) || "";
+      p.hasColor = isColorWork(s);   // paintings, watercolors, pastels: favored in the quiz
 
       const objectNumber = String(p.id || p.key).replace(/^object\//, "");
       p.accessURL = /^\d+$/.test(objectNumber)
@@ -88,6 +92,16 @@ function workCategory(s) {
   if (/^oil/.test(medium) && !/paper/.test(medium)) return "painting";
   if (/paper|watercolor|pastel|graphite|grapite|charcoal|chacoal|ink/.test(medium)) return "paper";
   return "other";
+}
+
+// Works with color (paintings, watercolors, pastels, gouache) versus
+// drawings in graphite, charcoal, ink, or pen. The quiz favors color
+// works but still mixes in a few drawings.
+function isColorWork(s) {
+  const types = (s.item_type || []).join(" ").toLowerCase();
+  const medium = ((s.classified_as || [])[0] || "").toLowerCase();
+  if (/paintings/.test(types)) return true;
+  return /oil|watercolor|pastel|gouache|tempera|acrylic|colou?r|crayon/.test(medium);
 }
 
 function iiifURL(work, spec) {
@@ -345,8 +359,9 @@ function describeLevel(value, cuts, words) {
 // Cache of analyses (this browser only)
 // ============================================================
 
-// Bump when composition.js changes, so stale numbers are dropped.
-const ANALYSIS_VERSION = "v6-diagfix";
+// Bump when composition.js or the image set changes, so stale numbers are dropped.
+// "best": paintings.json switched to the Museum's best-images list (October 5, 2026).
+const ANALYSIS_VERSION = "v6-diagfix-best";
 const CACHE_KEY = "gokm-composition-cache";
 
 function loadCachedAnalyses() {

@@ -15,6 +15,14 @@
 const ROUNDS = 5;
 const MIN_READY = 80;            // works read before the quiz can start
 
+// Color first, drawings for spice. A game shows ten works; at most this
+// many are drawings (graphite, charcoal, ink, pen). The rest are paintings,
+// watercolors, and pastels. Set to 10 to stop favoring color.
+const MAX_DRAWINGS = 3;
+// How often a round starts from a drawing (when the drawing budget allows).
+// Its partner can still be either kind, so drawing-and-painting pairs happen.
+const DRAWING_START_CHANCE = 0.15;
+
 let screen = "intro";            // intro | play | end
 let game = null;                 // { rounds: [...], i, phase }
 
@@ -38,13 +46,17 @@ function buildGame() {
   shuffle(truths);
 
   const rounds = [];
+  const budget = { drawings: MAX_DRAWINGS };
+  const loose = { drawings: Infinity };      // last resort if the color rule leaves no pair
   for (const truth of truths) {
-    const pair = truth === "alike" ? pickAlikePair(pool, used) : pickDifferentPair(pool, used);
-    const fallback = pair || (truth === "alike" ? pickDifferentPair(pool, used) : pickAlikePair(pool, used));
-    if (!fallback) continue;
-    used.add(fallback.a.key);
-    used.add(fallback.b.key);
-    rounds.push(fallback);
+    const pick = (t, b) => t === "alike" ? pickAlikePair(pool, used, b) : pickDifferentPair(pool, used, b);
+    const other = truth === "alike" ? "different" : "alike";
+    const pair = pick(truth, budget) || pick(other, budget) || pick(truth, loose) || pick(other, loose);
+    if (!pair) continue;
+    used.add(pair.a.key);
+    used.add(pair.b.key);
+    budget.drawings -= (pair.a.hasColor ? 0 : 1) + (pair.b.hasColor ? 0 : 1);
+    rounds.push(pair);
   }
 
   return { rounds, i: 0, phase: "loading" };
@@ -61,13 +73,30 @@ function countVerdicts(v) {
   return c;
 }
 
-function pickAlikePair(pool, used) {
+// Pick the first work of a pair: usually a color work, sometimes a drawing.
+function pickStart(pool, used, budget) {
+  const open = pool.filter(w => !used.has(w.key));
+  const color = open.filter(w => w.hasColor);
+  const drawings = open.filter(w => !w.hasColor);
+  const wantDrawing = budget.drawings > 0 && drawings.length &&
+    (!color.length || Math.random() < DRAWING_START_CHANCE);
+  const from = wantDrawing ? drawings : color.length ? color : (budget.drawings > 0 ? drawings : []);
+  return from.length ? from[Math.floor(Math.random() * from.length)] : null;
+}
+
+// Can the second work be a drawing, given the first and what's left in the budget?
+function partnerOK(a, w, budget) {
+  if (w.hasColor) return true;
+  return budget.drawings - (a.hasColor ? 0 : 1) > 0;
+}
+
+function pickAlikePair(pool, used, budget) {
   for (let tries = 0; tries < 200; tries++) {
-    const a = pool[Math.floor(Math.random() * pool.length)];
-    if (used.has(a.key)) continue;
+    const a = pickStart(pool, used, budget);
+    if (!a) return null;
     const A = analyses[a.key];
     const near = pool
-      .filter(w => w.key !== a.key && !used.has(w.key))
+      .filter(w => w.key !== a.key && !used.has(w.key) && partnerOK(a, w, budget))
       .map(w => ({ w, d: compositionDistance(A, analyses[w.key]) }))
       .sort((x, y) => x.d - y.d)
       .slice(0, 6);
@@ -84,13 +113,13 @@ function pickAlikePair(pool, used) {
   return null;
 }
 
-function pickDifferentPair(pool, used) {
+function pickDifferentPair(pool, used, budget) {
   for (let tries = 0; tries < 200; tries++) {
-    const a = pool[Math.floor(Math.random() * pool.length)];
-    if (used.has(a.key)) continue;
+    const a = pickStart(pool, used, budget);
+    if (!a) return null;
     const A = analyses[a.key];
     const far = pool
-      .filter(w => w.key !== a.key && !used.has(w.key))
+      .filter(w => w.key !== a.key && !used.has(w.key) && partnerOK(a, w, budget))
       .map(w => ({ w, d: compositionDistance(A, analyses[w.key]) }))
       .sort((x, y) => y.d - x.d);
     const top = far.slice(0, Math.max(5, Math.floor(far.length * 0.35)));
@@ -264,6 +293,7 @@ function loadRound(i) {
   $("reveal").hidden = true;
   $("cap-a").innerHTML = "";
   $("cap-b").innerHTML = "";
+  describePair(round);
   setAnswersEnabled(false);
   renderDots();
 
@@ -313,8 +343,8 @@ function endGame() {
     <li>
       <span class="n">${i + 1}</span>
       <span class="pair">
-        <img src="${iiifURL(r.a, "square/!112,112")}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
-        <img src="${iiifURL(r.b, "square/!112,112")}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
+        <img src="${iiifURL(r.a, "square/!112,112")}" alt="${esc(r.a.altText)}" loading="lazy" onerror="this.style.visibility='hidden'">
+        <img src="${iiifURL(r.b, "square/!112,112")}" alt="${esc(r.b.altText)}" loading="lazy" onerror="this.style.visibility='hidden'">
       </span>
       <span class="what"><i>${esc(r.a.shortTitle)}</i> and <i>${esc(r.b.shortTitle)}</i><br>
         You said ${r.answer === "alike" ? "similar" : "different"}. The computer said ${r.truth === "alike" ? "similar" : "different"}.</span>
@@ -383,8 +413,19 @@ function renderReveal(round) {
 }
 
 function caption(w, ring) {
-  return `${ring}<span><i>${esc(w.shortTitle)}</i>${w.dateLabel ? ", " + esc(w.dateLabel) : ""}
-    ${w.accessURL ? `<br><a href="${w.accessURL}" target="_blank" rel="noopener">View on Access O'Keeffe ↗</a>` : ""}</span>`;
+  return `<div class="cap-line">${ring}<span><i>${esc(w.shortTitle)}</i>${w.dateLabel ? ", " + esc(w.dateLabel) : ""}
+    ${w.accessURL ? `<br><a href="${w.accessURL}" target="_blank" rel="noopener">View on Access O'Keeffe ↗</a>` : ""}</span></div>
+    ${w.altText ? `<details class="alt-text"><summary>Image description</summary><p>${esc(w.altText)}</p></details>` : ""}`;
+}
+
+// Screen readers hear each work's alt text while the visitor decides.
+// Titles stay hidden until the reveal, same as for sighted visitors.
+function describePair(round) {
+  const canvas = document.querySelector("#canvas-container canvas");
+  if (!canvas) return;
+  const left = round.a.altText || "A work by Georgia O'Keeffe.";
+  const right = round.b.altText || "A work by Georgia O'Keeffe.";
+  canvas.setAttribute("aria-label", `Two works by Georgia O'Keeffe. Left: ${left} Right: ${right}`);
 }
 
 function overlaySVG(a, b) {

@@ -304,8 +304,15 @@ function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 // ============================================================
 
 function startReading() {
-  readQueue = works.filter(w => !analyses[w.key]).map(w => w.key);
-  shuffle(readQueue);     // a spread of works early, so first games vary
+  // A spread of works early, so first games vary. Color works are read
+  // three to one ahead of drawings, so the first games have plenty of color.
+  const todo = works.filter(w => !analyses[w.key]);
+  const color = shuffle(todo.filter(w => w.hasColor).map(w => w.key));
+  const drawings = shuffle(todo.filter(w => !w.hasColor).map(w => w.key));
+  readQueue = [];
+  while (color.length || drawings.length) {
+    readQueue.push(...color.splice(0, 3), ...drawings.splice(0, 1));
+  }
   pumpReading();
 }
 

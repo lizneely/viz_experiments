@@ -114,7 +114,12 @@ h1 { margin: 0; font-weight: 800; font-size: clamp(44px, 7.4vw, 96px); line-heig
 .stage canvas { display: block; }
 .captions { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 32px; margin-top: -8px; }
 .captions.stacked { grid-template-columns: 1fr; }
-.cap { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.4; display: flex; gap: 10px; align-items: flex-start; }
+.cap { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.4; min-width: 0; }
+.cap-line { display: flex; gap: 10px; align-items: flex-start; }
+.alt-text { margin: 10px 0 0 26px; font-size: 13.5px; }
+.alt-text summary { cursor: pointer; color: var(--fg); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; width: fit-content; }
+.alt-text summary:hover { text-decoration-thickness: 2px; }
+.alt-text p { margin: 6px 0 0; max-width: 60ch; color: var(--muted); line-height: 1.5; }
 .cap:empty { display: none; }
 .cap i { font-style: italic; font-size: 16px; color: var(--fg); }
 .cap a { font-size: 13.5px; text-underline-offset: 3px; }
