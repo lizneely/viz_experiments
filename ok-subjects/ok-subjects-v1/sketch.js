@@ -1,3 +1,11 @@
+// Canvas text uses Schibsted Grotesk once it has loaded; until then (or if Google Fonts is blocked) Helvetica/Arial.
+let UI_FONT = "Helvetica";
+if (document.fonts && document.fonts.load) {
+  document.fonts.load('16px "Schibsted Grotesk"').then(f => {
+    if (f && f.length) { UI_FONT = "Schibsted Grotesk"; if (typeof redraw === "function") { try { redraw(); } catch (e) {} } }
+  });
+}
+
 // noprotect
 // O'Keeffe's Subjects, p5.js — version 1
 // Paste into sketch.js at editor.p5js.org, with the index.html provided (loads p5 1.9.4).
@@ -22,10 +30,10 @@ const IIIF = (dam, w, h) => `https://iiif.okeeffemuseum.org/image/iiif/2/${dam}/
 const TOP_ORDER = ["Landscapes", "Nature", "Abstractions", "Architecture and built environment", "Portraits and human figures", "Human-made objects", "Sketchbooks and other"];
 
 const PALETTES = {
-  light: { ground: "#EEF0EE", paper: "#F8F9F7", ink: "#1D2226", ink2: "#4C555C", ink3: "#7C868D", rule: "#D5DAD8", accent: "#A3302A",
+  light: { ground: "#FFFFFF", paper: "#F2F0EC", ink: "#171615", ink2: "#3E3A36", ink3: "#6B655E", rule: "#DEDAD4", accent: "#B8432A",
            cat: ["#B5533A", "#5F8446", "#3E5E9C", "#B0822F", "#7D4A7A", "#2C7C83", "#7C868D"],
            dec: ["#C9971F", "#D3822B", "#C9662F", "#B84B36", "#9E3948", "#80345C", "#61336C", "#453577", "#2E3B7C"] },
-  dark:  { ground: "#15191B", paper: "#1C2124", ink: "#E6E9E8", ink2: "#B3BBBF", ink3: "#848E94", rule: "#33393D", accent: "#E8746A",
+  dark:  { ground: "#141312", paper: "#1F1D1B", ink: "#EFEDEA", ink2: "#CFCAC4", ink3: "#A9A39C", rule: "#2F2C29", accent: "#E07A5F",
            cat: ["#DB7A5E", "#8DB26F", "#7C9AD6", "#D9AE5C", "#B07AAE", "#5DB0B6", "#9AA3A9"],
            dec: ["#E6BE5C", "#EBA35A", "#E88A5E", "#DD7166", "#CC6478", "#B45F8E", "#9C63A6", "#8671BC", "#7688CC"] }
 };
@@ -60,7 +68,7 @@ function setup() {
   card = createDiv("");
   if (stage) card.parent(stage.parentNode);
   card.style("max-width", "980px"); card.style("padding", "8px 0 8px");
-  card.style("font-family", "'Public Sans', system-ui, sans-serif"); card.style("font-size", "15px"); card.style("line-height", "1.5");
+  card.style("font-family", "'Schibsted Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif"); card.style("font-size", "15px"); card.style("line-height", "1.5");
   enter([], width / 2, height / 2);
 }
 function windowResized() { resizeCanvas(stageWidth(), H); layoutTargets(); }
@@ -164,7 +172,7 @@ function inkOn(c) { return (red(c) * 0.299 + green(c) * 0.587 + blue(c) * 0.114)
 function drawLabel(b, c) {
   const ink = inkOn(c);
   const size = constrain(b.r / 5.2, 11, 20);
-  textFont("Public Sans"); textStyle(BOLD); textSize(size); textAlign(CENTER, CENTER); fill(ink); noStroke();
+  textFont(UI_FONT); textStyle(BOLD); textSize(size); textAlign(CENTER, CENTER); fill(ink); noStroke();
   const w = b.r * 1.55;
   textWrap(WORD);
   const lines = wrapLines(b.label, w);
@@ -172,7 +180,7 @@ function drawLabel(b, c) {
   let y = b.y - total / 2 + lh / 2;
   if (lines.length * lh > b.r * 1.5) { lines.length = 1; lines[0] = clipText(b.label, 16); }
   lines.forEach(l => { text(l, b.x, y); y += lh; });
-  textStyle(NORMAL); textFont("IBM Plex Mono"); textSize(max(10, size * 0.72));
+  textStyle(NORMAL); textFont(UI_FONT); textSize(max(10, size * 0.72));
   const cc = color(ink); cc.setAlpha(210); fill(cc);
   text(b.n.toLocaleString(), b.x, y + 1);
 }
@@ -186,15 +194,15 @@ function drawTip(b) {
   let label, sub;
   if (b.kind === "work") { const w = WORKS[b.wi]; label = `${w[1]}, ${w[2]}`; sub = w[3] || ""; }
   else { const kid = nodeAt(path)[2][b.k]; label = b.label; sub = `${b.n.toLocaleString()} works · ${isWorks(kid) ? "click to see each work" : "click to open"}`; }
-  textFont("Public Sans"); textSize(13);
+  textFont(UI_FONT); textSize(13);
   const tw = max(textWidth(clipText(label, 64)), textWidth(sub)) + 20;
   let x = constrain(mouseX + 14, 4, width - tw - 4), y = constrain(mouseY + 16, 60, height - 50);
-  fill(P.paper); stroke(P.rule); strokeWeight(1); rect(x, y, tw, 44, 5); noStroke();
+  fill(P.paper); stroke(P.rule); strokeWeight(1); rect(x, y, tw, 44); noStroke();
   fill(P.ink); textAlign(LEFT, TOP); text(clipText(label, 64), x + 10, y + 7);
   fill(P.ink3); textSize(12); text(sub, x + 10, y + 25);
 }
 function drawCrumbs() {
-  textFont("Public Sans"); textSize(14); textAlign(LEFT, CENTER); noStroke();
+  textFont(UI_FONT); textSize(14); textAlign(LEFT, CENTER); noStroke();
   let x = 0; const y = 24;
   const names = ["All subjects"].concat(path.map((_, i) => nodeAt(path.slice(0, i + 1))[0]));
   names.forEach((nm, i) => {
@@ -211,11 +219,11 @@ function drawCrumbs() {
   });
   textStyle(NORMAL);
   const node = nodeAt(path);
-  textFont("IBM Plex Mono"); textSize(12); fill(P.ink3); textAlign(RIGHT, CENTER);
+  textFont(UI_FONT); textSize(12); fill(P.ink3); textAlign(RIGHT, CENTER);
   const note = isWorks(node) ? `${node[1]} works · one dot per work` : path.length >= 2 ? "levels below this were grouped by Claude from titles" : `${node[1].toLocaleString()} works`;
   text(note, width, y);
   if (path.length) {
-    textAlign(LEFT, CENTER); textFont("Public Sans"); textSize(12.5); fill(P.ink3);
+    textAlign(LEFT, CENTER); textFont(UI_FONT); textSize(12.5); fill(P.ink3);
     text("← back (Esc)", 0, 48);
     hits.push({ x: 0, y: 38, w: 90, h: 20, fn: () => goTo(path.length - 1) });
   }
@@ -230,12 +238,12 @@ function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").
 function workCard(wi, big) {
   const [id, title, date, inst, img, md, , fromClaude] = WORKS[wi];
   const thumb = img ? `<img src="${IIIF(img, big ? 240 : 160, big ? 200 : 140)}" alt="${esc(title)}" loading="lazy" onerror="this.remove()" style="flex:none;display:block;max-height:${big ? 100 : 70}px;max-width:${big ? 160 : 110}px;border-radius:2px">` : "";
-  return `<a href="${ACCESS_URL(id)}" target="_blank" rel="noopener" style="display:flex;gap:12px;align-items:center;padding:10px 12px;border:1px solid ${P.rule};border-radius:4px;text-decoration:none;color:inherit;background:${P.paper}">
+  return `<a href="${ACCESS_URL(id)}" target="_blank" rel="noopener" style="display:flex;gap:12px;align-items:center;padding:10px 12px;border:1px solid ${P.rule};border-radius:0;text-decoration:none;color:inherit;background:${P.paper}">
     ${thumb}<span style="min-width:0">
-      <span style="display:block;font-family:'Newsreader',Georgia,serif;font-style:italic;font-size:${big ? 20 : 16}px;line-height:1.25;color:${P.ink}">${esc(title)}</span>
+      <span style="display:block;font-family:'Schibsted Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-style:italic;font-size:${big ? 20 : 16}px;line-height:1.25;color:${P.ink}">${esc(title)}</span>
       ${big && md ? `<span style="display:block;font-size:13px;color:${P.ink2}">${esc(md)}</span>` : ""}
       <span style="display:block;font-size:12.5px;color:${P.ink2}">${esc(date)}${inst ? " · " + esc(inst) : ""}</span>
-      ${fromClaude ? `<span style="display:inline-block;margin-top:3px;font-size:10.5px;color:${P.ink3};border:1px solid ${P.ink3};border-radius:999px;padding:0 6px">subject assigned by Claude</span>` : ""}
+      ${fromClaude ? `<span style="display:inline-block;margin-top:3px;font-size:10.5px;color:${P.ink3};border:1px solid ${P.ink3};border-radius:0;padding:0 6px">subject assigned by Claude</span>` : ""}
       ${big ? `<span style="display:block;font-size:13px;font-weight:500;color:${P.accent};margin-top:5px">View on Access O'Keeffe ↗</span>` : ""}
     </span></a>`;
 }
@@ -247,7 +255,7 @@ function renderCard() {
     const list = node[3];
     const head = focus ? `<div style="max-width:640px;margin-bottom:14px">${workCard(focus.wi, true)}</div>` : "";
     const legend = P.dec.map((c, i) => `<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:${c}"></span>${1900 + i * 10}s</span>`).join("");
-    card.html(`${head}<div style="display:flex;flex-wrap:wrap;gap:4px 12px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:${P.ink3};margin-bottom:10px">Dots are colored by decade: ${legend}</div>
+    card.html(`${head}<div style="display:flex;flex-wrap:wrap;gap:4px 12px;font-family:'Schibsted Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:11.5px;color:${P.ink3};margin-bottom:10px">Dots are colored by decade: ${legend}</div>
       <div style="font-size:13px;color:${P.ink3};margin-bottom:8px">All ${list.length} works in <b style="color:${P.ink}">${esc(node[0])}</b>, earliest first</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px">${list.map(wi => workCard(wi, false)).join("")}</div>`);
     return;
@@ -255,7 +263,7 @@ function renderCard() {
   const kids = node[2];
   const derived = path.length >= 2;
   const origin = !path.length
-    ? `The seven big bubbles categorize O'Keeffe's Subjects (for example, Plants, Trees, Bones, Shells and Rocks all sit inside <b style="color:${P.ink}">Nature</b>). Click a bubble to break it apart.`
+    ? `The seven big bubbles categorize O'Keeffe's subjects (for example, Plants, Trees, Bones, Shells, and Rocks all sit inside <b style="color:${P.ink}">Nature</b>). Click a bubble to break it apart.`
     : derived
       ? `These groups were worked out by Claude from titles, related-work groups and brief descriptions. They are a starting point for curatorial review, not museum records.`
       : `These are the museum's Subject Categories inside ${esc(node[0])}. From the next level down, groups were worked out by Claude from titles.`;

@@ -1,3 +1,11 @@
+// Canvas text uses Schibsted Grotesk once it has loaded; until then (or if Google Fonts is blocked) Helvetica/Arial.
+let UI_FONT = "Helvetica";
+if (document.fonts && document.fonts.load) {
+  document.fonts.load('16px "Schibsted Grotesk"').then(f => {
+    if (f && f.length) { UI_FONT = "Schibsted Grotesk"; if (typeof redraw === "function") { try { redraw(); } catch (e) {} } }
+  });
+}
+
 // noprotect
 // Find an O'Keeffe near you, p5.js — version 1
 // Paste into sketch.js at editor.p5js.org, with the index.html provided (loads p5 1.9.4).
@@ -28,10 +36,10 @@ let R0 = 250, CX = 0, CY = 0, cphi = 1, sphi = 0;
 let showAll = false;
 
 const PALETTES = {
-  light: { ground: "#EEF0EE", paper: "#F8F9F7", ink: "#1D2226", ink2: "#4C555C", ink3: "#7C868D", rule: "#D5DAD8", accent: "#A3302A",
-           ocean: "#DCE3E4", land: "#F7F5EF", border: "#C6CCC9", state: "#DFE2DC", grat: "#CFD8DA", rim: "#B9C3C5", ring: "#F8F9F7" },
-  dark:  { ground: "#15191B", paper: "#1D2225", ink: "#E6E9E8", ink2: "#B3BBBF", ink3: "#848E94", rule: "#2E3539", accent: "#E8746A",
-           ocean: "#1B2327", land: "#2B3236", border: "#434C51", state: "#373F43", grat: "#232C30", rim: "#3A4448", ring: "#15191B" }
+  light: { ground: "#FFFFFF", paper: "#F2F0EC", ink: "#171615", ink2: "#3E3A36", ink3: "#6B655E", rule: "#DEDAD4", accent: "#B8432A",
+           ocean: "#D6E2EA", land: "#F7F3EA", border: "#C9C1B3", state: "#E6DFD2", grat: "#C6D4DE", rim: "#AFC0CB", ring: "#FFFFFF" },
+  dark:  { ground: "#141312", paper: "#1F1D1B", ink: "#EFEDEA", ink2: "#CFCAC4", ink3: "#A9A39C", rule: "#2F2C29", accent: "#E07A5F",
+           ocean: "#1C252B", land: "#2C2925", border: "#4A443E", state: "#3A3530", grat: "#252E34", rim: "#3C4950", ring: "#141312" }
 };
 function pickPalette() {
   const t = document.documentElement.getAttribute("data-theme");
@@ -81,7 +89,7 @@ function setup() {
   c.parent("globe-canvas");
   c.elt.style.touchAction = "none";
   c.elt.setAttribute("aria-label", "A globe showing where public collections hold works by Georgia O'Keeffe. Drag to turn it, scroll or use the buttons to zoom, and click where you are to list the nearest collections.");
-  textFont("Public Sans");
+  textFont(UI_FONT);
   renderPanel();
 }
 
@@ -108,25 +116,25 @@ function buildDom() {
 #globe-canvas{flex:1 1 auto;min-width:0}
 #globe-panel{position:relative;flex:0 0 340px;overflow:auto;border-left:1px solid var(--rule,#D5DAD8);padding:2px 2px 2px 20px;font-size:14px;line-height:1.45;color:var(--ink)}
 #globe-wrap.narrow #globe-panel{border-left:0;padding:0;flex-basis:auto}
-#globe-panel h3{font:500 12px/1.2 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin:18px 0 8px}
+#globe-panel h3{font:700 14px/1.2 var(--sans);letter-spacing:-.005em;color:var(--ink);margin:20px 0 8px}
 #globe-panel > h3:first-child{margin-top:0}
-#globe-panel .gsearch{width:100%;box-sizing:border-box;font:inherit;padding:8px 10px;border:1px solid var(--ink3);border-radius:6px;background:transparent;color:var(--ink)}
+#globe-panel .gsearch{width:100%;box-sizing:border-box;font:inherit;padding:8px 10px;border:1px solid var(--ink3);border-radius:0;background:transparent;color:var(--ink)}
 #globe-panel .gsearch:focus{outline:2px solid var(--g);outline-offset:1px}
 #globe-panel .row{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule,#D5DAD8);padding:8px 0;font:inherit;color:inherit;cursor:pointer}
 #globe-panel .row:hover .nm{text-decoration:underline}
 #globe-panel .nm{font-weight:600}
-#globe-panel .meta{font:12px/1.4 "IBM Plex Mono",monospace;color:var(--ink3)}
-#globe-panel .dist{float:right;font:12px/1.6 "IBM Plex Mono",monospace;color:var(--ink2)}
+#globe-panel .meta{font:12.5px/1.4 var(--sans);color:var(--ink3)}
+#globe-panel .dist{float:right;font:12.5px/1.6 var(--sans);color:var(--ink2);font-variant-numeric:tabular-nums}
 #globe-panel .hint{color:var(--ink2);margin:0 0 6px}
-#globe-panel .title{font-family:"Newsreader",Georgia,serif;font-size:24px;line-height:1.15;margin:0 0 4px}
+#globe-panel .title{font-family:var(--sans);font-weight:800;font-size:24px;line-height:1.1;letter-spacing:-.02em;margin:0 0 4px}
 #globe-panel .note{font-size:12.5px;color:var(--ink3);margin:6px 0 0}
 #globe-panel .w{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--rule,#D5DAD8)}
 #globe-panel .w img{width:56px;height:56px;object-fit:contain;flex:none;background:var(--rule,#D5DAD8)}
-#globe-panel .w i{font-family:"Newsreader",Georgia,serif;font-size:16px}
+#globe-panel .w i{font-family:var(--sans);font-style:italic;font-size:15.5px}
 #globe-panel .w small{display:block;color:var(--ink3);font-size:12px;line-height:1.35}
-#globe-panel a{color:var(--g)}
-#globe-panel .more{margin-top:10px;font:inherit;background:none;border:1px solid var(--ink3);border-radius:999px;padding:5px 12px;color:var(--ink);cursor:pointer}
-#globe-panel .back{font:inherit;background:none;border:0;padding:0;color:var(--g);cursor:pointer;margin-bottom:8px}
+#globe-panel a{color:var(--ink);text-underline-offset:3px}
+#globe-panel .more{margin-top:10px;font:inherit;border:0;background:var(--ink);padding:9px 14px;color:var(--ground);font-weight:600;cursor:pointer}
+#globe-panel .back{font:inherit;font-weight:600;background:none;border:0;padding:0;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer;margin-bottom:8px}
 `;
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
   const stage = select("#stage") || createDiv().id("stage");
@@ -380,7 +388,7 @@ function drawMarkers() {
     circle(c.x, c.y, c.r * 2);
     if (c === hoverC || isSel(c)) { noFill(); stroke(P.ink); strokeWeight(2); circle(c.x, c.y, c.r * 2 + 6); }
     if (c.r >= 10 && museum) {
-      noStroke(); fill(P.ring); textFont("IBM Plex Mono"); textSize(c.r >= 16 ? 12 : 10); textAlign(CENTER, CENTER);
+      noStroke(); fill(P.ring); textFont(UI_FONT); textSize(c.r >= 16 ? 12 : 10); textAlign(CENTER, CENTER);
       const t = c.n.toLocaleString();
       if (textWidth(t) < c.r * 2 - 6) { text(t, c.x, c.y + 0.5); }
     }
@@ -393,7 +401,7 @@ function drawYou() {
   const pulse = reduceMotion ? 0 : (millis() % 1800) / 1800;
   noFill(); const c = color(P.ink); c.setAlpha(160 * (1 - pulse)); stroke(c); strokeWeight(1.5); circle(q[0], q[1], 12 + 26 * pulse);
   fill(P.ink); stroke(P.ring); strokeWeight(2); circle(q[0], q[1], 11);
-  noStroke(); fill(P.ink); textFont("Public Sans"); textStyle(BOLD); textSize(12); textAlign(LEFT, CENTER);
+  noStroke(); fill(P.ink); textFont(UI_FONT); textStyle(BOLD); textSize(12); textAlign(LEFT, CENTER);
   text("You", q[0] + 10, q[1] - 12); textStyle(NORMAL);
 }
 function drawArc(a, s) {       // great-circle path from your spot to the nearest collection
@@ -417,13 +425,13 @@ function drawArc(a, s) {       // great-circle path from your spot to the neares
 // ---------- on-canvas controls ----------
 function btn(x, y, w, h, label, fn, aria) {
   const over = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
-  fill(P.paper); stroke(over ? P.ink2 : P.rule); strokeWeight(1); rect(x, y, w, h, 6);
+  fill(P.paper); stroke(over ? P.ink2 : P.rule); strokeWeight(1); rect(x, y, w, h);
   noStroke(); fill(P.ink); textAlign(CENTER, CENTER); text(label, x + w / 2, y + h / 2 + 0.5);
   hits.push({ x, y, w, h, fn });
 }
 function overHit() { return hits.some(b => mouseX >= b.x && mouseX <= b.x + b.w && mouseY >= b.y && mouseY <= b.y + b.h); }
 function drawControls() {
-  textFont("Public Sans"); textSize(18);
+  textFont(UI_FONT); textSize(18);
   const x = width - 44;
   btn(x, 12, 32, 32, "+", () => zoomBy(1.6));
   btn(x, 48, 32, 32, "−", () => zoomBy(1 / 1.6));
@@ -433,10 +441,10 @@ function drawControls() {
 }
 function drawLegend() {
   const x = 14, y = height - 46;
-  textFont("IBM Plex Mono"); textSize(11); textAlign(LEFT, CENTER); noStroke();
+  textFont(UI_FONT); textSize(11); textAlign(LEFT, CENTER); noStroke();
   const note = width < 560 ? "Size: works held. Zoom in to separate." : "Circle size and number: works held. Nearby collections merge until you zoom in.";
   const bg = color(P.ground); bg.setAlpha(215); fill(bg);
-  rect(x - 8, y - 14, max(textWidth(note), 250) + 16, 46, 6);
+  rect(x - 8, y - 14, max(textWidth(note), 250) + 16, 46);
   fill(P.accent); stroke(P.ring); strokeWeight(1.2); circle(x + 6, y, 11);
   noStroke(); fill(P.ink3); text("Museum", x + 18, y);
   const x2 = x + 18 + textWidth("Museum") + 16;
@@ -449,15 +457,15 @@ function drawTooltip() {
   const c = hoverC, one = c.list.length === 1, s = c.list[0];
   const l1 = one ? s.name : `${c.list.length} collections`;
   const l2 = one ? `${place(s)} · ${worksN(s.n)}` : `${sameCity(c.list) ? place(s) + " · " : ""}${worksN(c.n)} · click to see them`;
-  textFont("Public Sans"); textStyle(BOLD); textSize(13); const w1 = textWidth(l1); textStyle(NORMAL);
-  textFont("IBM Plex Mono"); textSize(11); const w2 = textWidth(l2);
+  textFont(UI_FONT); textStyle(BOLD); textSize(13); const w1 = textWidth(l1); textStyle(NORMAL);
+  textFont(UI_FONT); textSize(11); const w2 = textWidth(l2);
   const w = max(w1, w2) + 20, h = 44;
   let bx = c.x + c.r + 8, by = c.y - h / 2;
   if (bx + w > width - 6) { bx = c.x - c.r - 8 - w; }
   by = constrain(by, 6, height - h - 6);
-  fill(P.paper); stroke(P.rule); strokeWeight(1); rect(bx, by, w, h, 5);
-  noStroke(); fill(P.ink); textFont("Public Sans"); textStyle(BOLD); textSize(13); textAlign(LEFT, TOP); text(l1, bx + 10, by + 7); textStyle(NORMAL);
-  fill(P.ink2); textFont("IBM Plex Mono"); textSize(11); text(l2, bx + 10, by + 26);
+  fill(P.paper); stroke(P.rule); strokeWeight(1); rect(bx, by, w, h);
+  noStroke(); fill(P.ink); textFont(UI_FONT); textStyle(BOLD); textSize(13); textAlign(LEFT, TOP); text(l1, bx + 10, by + 7); textStyle(NORMAL);
+  fill(P.ink2); textFont(UI_FONT); textSize(11); text(l2, bx + 10, by + 26);
 }
 function sameCity(L) { return L.every(s => s.city === L[0].city); }
 
