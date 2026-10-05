@@ -6,7 +6,7 @@
   <title>Eye for O'Keeffe</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap" />
   <link rel="stylesheet" href="style.css" />
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.1/p5.min.js"></script>
@@ -22,20 +22,20 @@
   <!-- p5: reads the collection and draws each pair -->
   <script src="sketch.js"></script>
 </head>
+
 <body>
 
   <div class="lab" role="note" aria-label="About this prototype">
     <div class="lab-in">
-      <div class="lab-brand"><span class="lab-mark" aria-hidden="true"></span>O'Keeffe Experiments</div>
-      <div class="lab-note"><span class="lab-pill">Prototype</span><span>The following prototype is for experimental purposes and is using information that has not been reviewed.</span></div>
+      <div class="lab-brand">O'Keeffe Experiments</div>
+      <div class="lab-note">The following prototype is for experimental purposes and is using information that has not been reviewed.</div>
     </div>
   </div>
 
   <header class="top">
     <div class="top-in">
-      <div class="eyebrow">Georgia O'Keeffe Museum · Digital Experience</div>
       <h1>Eye for O'Keeffe</h1>
-      <p class="lede">How well do you read an O'Keeffe? In five rounds, look at two of her works and decide whether their compositions are similar. Then see how a computer reads them. This prototype based on a computer vision prototype by Jonathan Lee from NMHU.</p>
+      <p class="lede">How well do you read an O'Keeffe? In five rounds, look at two of her works and decide whether their compositions are similar. Then see how a computer reads them.</p>
     </div>
   </header>
 
@@ -43,7 +43,7 @@
     <section class="panel game" aria-live="polite">
 
       <div class="game-top">
-        <span id="round-label" class="eyebrow">Five rounds</span>
+        <span id="round-label" class="round">Five rounds</span>
         <ol id="dots" class="dots" aria-label="Your answers so far"></ol>
       </div>
 
@@ -60,7 +60,7 @@
           <button id="start" class="btn btn-primary btn-big" type="button" disabled>Start</button>
           <div id="ready" class="ready">
             <div class="progress-bar" aria-hidden="true"><span id="ready-fill"></span></div>
-            <span id="ready-text" class="meta">Getting the works ready…</span>
+            <span id="ready-text" class="ready-text">Getting the works ready…</span>
           </div>
         </div>
       </div>
@@ -100,7 +100,7 @@
               <figcaption class="overlay-key">
                 <span><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="6.5" class="g-stroke" fill="none" stroke-width="2.5"/></svg> Left work</span>
                 <span><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="6.5" class="ink-stroke" fill="none" stroke-width="2" stroke-dasharray="3.5 2.5"/></svg> Right work</span>
-                <span class="meta">Both marks on one frame</span>
+                <span class="key-note">Both marks on one frame</span>
               </figcaption>
             </figure>
             <div class="table-wrap">
@@ -150,57 +150,72 @@
     </section>
   </main>
 
-<!-- O'Keeffe Experiments: shared banner link + footer (v3).
-     Paste this whole block just before </body> in any prototype's index.html.
-     It replaces the earlier "All prototypes" block (v1 or v2): delete that one first.
+  <footer class="foot">
+    <p class="fine">O'Keeffe Experiments is from the Digital Experience team at the Georgia O'Keeffe Museum. These prototypes use data and images from <em>Access O'Keeffe</em>, including the catalogue raisonné, along with some subject information added with the help of AI. Because these are prototypes, the data and images have not been reviewed for publication in this format.</p>
+  </footer>
 
-     It does two things:
-     1. Adds "All prototypes" to the O'Keeffe Experiments banner without making it taller.
-     2. Sets the footer text and adds a "Share your feedback" link. If the page already
+
+<!-- O'Keeffe Experiments: shared banner + footer (v4, gallery-wall look).
+     Paste this whole block just before </body> in any prototype's index.html.
+     It replaces any earlier version (v1–v3): delete that one first.
+
+     It does three things:
+     1. Restyles the O'Keeffe Experiments banner in the new look (black bar, one sans
+        typeface, no badge or dot) and adds "All prototypes" without making it taller.
+     2. Sets the footer text and adds a "Share your feedback" button. If the page already
         has a footer note (class "fine"), its text is replaced; if not, a footer is added.
+     3. Loads the typeface it needs, so it works on pages that haven't been restyled yet.
 
      To change the footer wording or links later, edit the three lines marked EDIT below. -->
 <style>
-  /* Banner link */
+  @import url("https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400;0,600;0,700;1,400&display=swap");
+
+  /* Banner, new look */
+  .okx-banner { font-family: "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif; align-items: baseline; }
+  .lab:has(.okx-banner) { background: #171615; color: #F3F1EE; }
+  .okx-banner .lab-mark, .okx-banner .lab-pill { display: none; }
+  .okx-banner .lab-brand { font-family: inherit; font-weight: 700; font-size: 17px; letter-spacing: -.01em; }
+  .okx-banner .lab-brand em { font-style: normal; font-weight: inherit; }
+  .okx-banner .lab-note { font-size: 13.5px; opacity: .85; flex: 1 1 320px; min-width: 0; }
+
+  /* "All prototypes" link */
   .okx-home {
-    flex: none; display: inline-flex; align-items: center; gap: 7px; margin-left: auto;
-    font: 600 13px/1 "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    flex: none; display: inline-flex; align-items: center; gap: 8px; margin-left: auto; align-self: center;
+    font: 600 13.5px/1 "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: inherit; text-decoration: none; white-space: nowrap;
-    border: 1px solid currentColor; border-radius: 999px; padding: 7px 12px;
+    border: 1px solid currentColor; padding: 7px 11px;
   }
-  .okx-home svg { width: 12px; height: 12px; flex: none; }
-  .okx-home:hover { background: rgba(127, 127, 127, .2); }
-  .okx-home:focus-visible, .okx-feedback:focus-visible { outline: 2px solid #E8746A; outline-offset: 3px; }
-  .okx-banner .lab-note { flex: 1 1 320px; min-width: 0; }
+  .okx-home svg { width: 11px; height: 11px; flex: none; }
+  .okx-home:hover { background: #F3F1EE; color: #171615; }
+  .okx-home:focus-visible, .okx-feedback:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
   @media (max-width: 760px) {
-    .okx-banner .okx-home { order: 1; padding: 5px 11px; }
+    .okx-banner .okx-home { order: 1; padding: 5px 9px; }
     .okx-banner .lab-note { order: 2; flex-basis: 100%; }
   }
   @media (max-width: 480px) {
-    .okx-home { padding: 5px 9px; }
     .okx-home .okx-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
-  .okx-bar { background: #1D2226; color: #EEF0EE; padding: 10px 20px; display: flex; }
+  .okx-bar { background: #171615; color: #F3F1EE; padding: 10px 20px; display: flex; }
 
   /* Footer */
-  .okx-footer { max-width: 1120px; margin: 0 auto; padding: 24px 20px 48px; }
-  .okx-footer-in { display: grid; gap: 12px; justify-items: start; }
+  .okx-footer { max-width: 1200px; margin: 0 auto; padding: 24px 20px 56px; }
+  .okx-footer-in { display: grid; gap: 14px; justify-items: start; }
   .okx-fine {
     margin: 0; max-width: 80ch;
-    font: 13px/1.55 "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-    color: var(--ink3, #7C868D);
+    font: 13px/1.55 "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: var(--muted, var(--ink3, #6B655E));
   }
   .okx-fine em { font-style: italic; }
   .okx-feedback {
-    display: inline-flex; align-items: center; gap: 6px;
-    font: 600 13.5px/1 "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-    color: var(--ink, #1D2226); text-decoration: none;
-    border: 1.5px solid currentColor; border-radius: 999px; padding: 8px 14px;
+    display: inline-block;
+    font: 600 14.5px/1 "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--fg, var(--ink, #171615)); color: var(--bg, var(--paper, #FFFFFF));
+    text-decoration: none; padding: 12px 16px;
   }
-  .okx-feedback:hover { background: var(--ink, #1D2226); color: var(--ground, #EEF0EE); }
+  .okx-feedback:hover { opacity: .85; }
 </style>
 <a class="okx-home" href="https://okeeffe-experiments.netlify.app/" title="All O'Keeffe Experiments prototypes">
-  <svg viewBox="0 0 12 12" aria-hidden="true"><g fill="currentColor"><rect x="0" y="0" width="5" height="5" rx="1"/><rect x="7" y="0" width="5" height="5" rx="1"/><rect x="0" y="7" width="5" height="5" rx="1"/><rect x="7" y="7" width="5" height="5" rx="1"/></g></svg>
+  <svg viewBox="0 0 12 12" aria-hidden="true"><g fill="currentColor"><rect x="0" y="0" width="5" height="5"/><rect x="7" y="0" width="5" height="5"/><rect x="0" y="7" width="5" height="5"/><rect x="7" y="7" width="5" height="5"/></g></svg>
   <span class="okx-label">All prototypes</span>
 </a>
 <script>
@@ -209,9 +224,9 @@
     var FOOTER_TEXT = "O'Keeffe Experiments is from the Digital Experience team at the Georgia O'Keeffe Museum. These prototypes use data and images from <em>Access O'Keeffe</em>, including the catalogue raisonné, along with some subject information added with the help of AI. Because these are prototypes, the data and images have not been reviewed for publication in this format.";
     // EDIT: feedback form link and its label
     var FEEDBACK_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdsjmbq0M56niYfdl4N5c52cS8dOA0HCDvSLCFJTwfPspdQbg/viewform?usp=publish-editor";
-    var FEEDBACK_LABEL = "Share your feedback ↗";
+    var FEEDBACK_LABEL = "Share your feedback";
 
-    // 1. Banner link
+    // 1. Banner
     var link = document.currentScript.previousElementSibling;
     var banner = document.querySelector(".lab-in");
     if (banner) {
@@ -236,7 +251,7 @@
     if (existing) {
       existing.innerHTML = FOOTER_TEXT;
       existing.insertAdjacentElement("afterend", feedback);
-      feedback.style.marginTop = "12px";
+      feedback.style.marginTop = "14px";
     } else {
       var footer = document.createElement("footer");
       footer.className = "okx-footer";
@@ -253,5 +268,6 @@
     }
   })();
 </script>
+
 </body>
 </html>
