@@ -46,6 +46,20 @@ h1{margin:0;font-weight:800;font-size:clamp(44px,7.4vw,96px);line-height:.94;let
 .swatch{aspect-ratio:1;border:1px solid rgba(0,0,0,.14);background:var(--c);cursor:pointer;padding:0}
 .swatch[aria-pressed="true"]{outline:2px solid var(--fg);outline-offset:2px}
 .chips{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+.bubbles{position:relative;width:100%;--bub:var(--paper)}
+.bubble{position:absolute;left:50%;top:50%;width:0;height:0;border:0;padding:0;border-radius:50%;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;text-align:center;line-height:1.1;
+  color:var(--fg);background:radial-gradient(closest-side,var(--bub) calc(100% - 5px),transparent calc(100% - 4px)),var(--ring,var(--line));
+  box-shadow:0 0 0 1px var(--line);transition:left .4s ease,top .4s ease,width .4s ease,height .4s ease;overflow:hidden}
+.bubble .bl{font-weight:600;padding:0 6px;text-wrap:balance}
+.bubble .bn{font-size:.85em;color:var(--muted);font-variant-numeric:tabular-nums}
+.bubble:hover,.bubble:focus-visible{--bub:var(--line)}
+.bubble[aria-pressed="true"]{--bub:var(--fg);color:var(--bg)}
+.bubble[aria-pressed="true"] .bn{color:var(--bg);opacity:.75}
+.bubble:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+#bubble-caption{min-height:2.9em}
+#bubble-caption b{color:var(--fg);font-weight:600}
+@media (prefers-reduced-motion: reduce){.bubble{transition:none}}
 .chip{display:flex;justify-content:space-between;gap:12px;background:transparent;border:0;border-bottom:1px solid var(--line);padding:8px 2px;text-align:left;cursor:pointer;font-size:14px}
 .chip .n{color:var(--muted);font-variant-numeric:tabular-nums}
 .chip[aria-pressed="true"]{font-weight:700}
@@ -188,7 +202,8 @@ h1{margin:0;font-weight:800;font-size:clamp(44px,7.4vw,96px);line-height:.94;let
           <p class="note">Each swatch is a color tag from the collection records. Pick one to see the works tagged with it.</p>
         </div>
         <div id="panel-subject" role="tabpanel" hidden>
-          <div class="chips" id="subject-list"></div>
+          <div class="bubbles" id="subject-bubbles" role="group" aria-label="Subjects"></div>
+          <p class="note" id="bubble-caption" aria-live="polite"></p>
         </div>
         <div class="filters" id="active-filters" aria-live="polite"></div>
         <p id="loading">Loading the collection…</p>
@@ -282,6 +297,7 @@ h1{margin:0;font-weight:800;font-size:clamp(44px,7.4vw,96px);line-height:.94;let
 <script src="works.js"></script>
 <script src="wall.js"></script>
 <script src="share.js"></script>
+<script src="bubbles.js"></script>
 <script src="ui.js"></script>
 
 <!-- O'Keeffe Experiments: shared banner + footer (v4, gallery-wall look).

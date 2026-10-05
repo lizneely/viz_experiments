@@ -9,6 +9,7 @@ Drag this whole folder onto Netlify (or upload the files to the p5 web editor).
 - `works.js`: loads and normalizes `paintings.json` (adapted from ColorGrid's museum.js)
 - `wall.js`: the p5 sketch: the wall, to-scale hanging, salon packing, dragging
 - `share.js`: Save as image (poster PNG), Copy checklist, and Copy link
+- `bubbles.js`: the By subject bubble chart (area = number of works; ring = the subject's top color tags)
 - `ui.js`: the controls (color and subject picker, wall color, title wall, Exhibition Checklist)
 - `paintings.json`: the 1,265 best-images records from Eye for O'Keeffe (search index plus the Museum's
   best image, alt text, and photo credit for each work), trimmed to the fields used

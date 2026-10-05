@@ -62,22 +62,21 @@ function buildFilters() {
     renderResults();
   });
 
-  const sl = $("#subject-list");
-  sl.innerHTML = SUBJECT_LIST.map((s, i) =>
-    `<button type="button" class="chip" data-i="${i}" aria-pressed="false"><span>${esc(s.name)}</span><span class="n">${s.works.length}</span></button>`
-  ).join("");
-  sl.addEventListener("click", e => {
-    const b = e.target.closest(".chip"); if (!b) return;
-    const s = SUBJECT_LIST[+b.dataset.i];
-    F.subject = F.subject === s ? null : s; F.shown = RESULTS_PAGE;
-    renderResults();
-  });
+  // subject bubbles redraw when their width changes (and when the tab first opens)
+  if (window.ResizeObserver) {
+    let lastW = 0;
+    new ResizeObserver(entries => {
+      const w = Math.round(entries[0].contentRect.width);
+      if (w && w !== lastW) { lastW = w; renderSubjectBubbles(); }
+    }).observe($("#subject-bubbles"));
+  }
 
   document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
     F.tab = t.dataset.tab;
     document.querySelectorAll(".tab").forEach(x => x.setAttribute("aria-selected", x === t ? "true" : "false"));
     $("#panel-color").hidden = F.tab !== "color";
     $("#panel-subject").hidden = F.tab !== "subject";
+    if (F.tab === "subject") renderSubjectBubbles();
   }));
 
   $("#results").addEventListener("click", e => {
@@ -104,7 +103,7 @@ function filteredWorks() {
 
 function renderResults() {
   document.querySelectorAll(".swatch").forEach(b => b.setAttribute("aria-pressed", COLOR_LIST[+b.dataset.i] === F.color ? "true" : "false"));
-  document.querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", SUBJECT_LIST[+b.dataset.i] === F.subject ? "true" : "false"));
+  renderSubjectBubbles();
 
   const list = filteredWorks();
   const chips = [];
