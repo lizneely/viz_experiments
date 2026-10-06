@@ -1,8 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>html,body{margin:0;padding:0}</style>
 <title>O'Keeffe Experiments</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap">
 <style>
@@ -22,20 +23,21 @@
   --sage: #B7C1A3;
   --hill: #CF6A4E;
   --petal: #EBC9C1;
+  --adobe: #D8B48E;
   --sans: "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #141312; --fg: #EFEDEA; --muted: #A9A39C; --line: #2F2C29;
     --btn: #EFEDEA; --btn-fg: #141312; --band: #0A0A09; --band-fg: #F3F1EE;
-    --sky: #93AFC3; --bone: #D6C3A3; --sage: #9FAA8B; --hill: #C25E43; --petal: #D9B3AA;
+    --sky: #93AFC3; --bone: #D6C3A3; --sage: #9FAA8B; --hill: #C25E43; --petal: #D9B3AA; --adobe: #C49E78;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #141312; --fg: #EFEDEA; --muted: #A9A39C; --line: #2F2C29;
   --btn: #EFEDEA; --btn-fg: #141312; --band: #0A0A09; --band-fg: #F3F1EE;
-  --sky: #93AFC3; --bone: #D6C3A3; --sage: #9FAA8B; --hill: #C25E43; --petal: #D9B3AA;
+  --sky: #93AFC3; --bone: #D6C3A3; --sage: #9FAA8B; --hill: #C25E43; --petal: #D9B3AA; --adobe: #C49E78;
   color-scheme: dark;
 }
 
@@ -67,20 +69,20 @@ h1 { margin: 0; font-weight: 800; font-size: clamp(44px, 7.4vw, 96px); line-heig
 .link { font-weight: 500; font-size: 15px; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
 .link:hover { text-decoration-thickness: 2px; }
 
-/* The wall */
+/* The wall: rows of three (two below 980 px, one below 640 px) */
 .wall { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 48px 32px; }
 .work { display: grid; grid-template-rows: auto 1fr; gap: 18px; min-width: 0; }
 .work.wide { grid-column: span 2; }
 .work.half { grid-column: span 3; }
-@media (max-width: 980px) { .work.wide, .work.half { grid-column: span 3; } .work:last-child { grid-column: 1 / -1; } }
-@media (max-width: 640px) { .wall { grid-template-columns: 1fr; gap: 44px; } .work.wide, .work.half, .work:last-child { grid-column: auto; } }
+@media (max-width: 980px) { .work.wide, .work.half { grid-column: span 3; } .work:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+@media (max-width: 640px) { .wall { grid-template-columns: 1fr; gap: 44px; } .work.wide, .work.half, .work:last-child:nth-child(odd) { grid-column: auto; } }
 
 .field { display: block; aspect-ratio: 16 / 10; max-width: 100%; overflow: hidden;
   --rule: rgba(23, 22, 21, .3); --ink2: #171615; --ink3: #171615; --g: #171615; --paper: #FFFFFF; --g-ink: #FFFFFF; }
 .work.half .field { aspect-ratio: 16 / 8; }
 .field svg { display: block; width: 100%; height: 100%; }
 .f-sky { background: var(--sky); } .f-bone { background: var(--bone); } .f-sage { background: var(--sage); }
-.f-hill { background: var(--hill); } .f-petal { background: var(--petal); }
+.f-hill { background: var(--hill); } .f-petal { background: var(--petal); } .f-adobe { background: var(--adobe); }
 
 .label { display: grid; grid-template-rows: auto auto 1fr auto; gap: 10px; min-width: 0; }
 .label .acts { align-self: end; }
@@ -111,14 +113,13 @@ h1 { margin: 0; font-weight: 800; font-size: clamp(44px, 7.4vw, 96px); line-heig
 
 .fine { margin: 0; font-size: 13px; color: var(--muted); max-width: 80ch; }
 </style>
+
 </head>
-<body style="margin:0">
-
-
+<body>
 <div class="lab" role="note" aria-label="About these prototypes">
   <div class="lab-in">
     <div class="lab-brand">O'Keeffe Experiments</div>
-    <div class="lab-note">The following prototype is for experimental purposes and is using information that has not been reviewed.</div>
+    <div class="lab-note">The following prototypes are for experimental purposes and are using information that has not been reviewed.</div>
   </div>
 </div>
 
@@ -126,7 +127,7 @@ h1 { margin: 0; font-weight: 800; font-size: clamp(44px, 7.4vw, 96px); line-heig
   <section class="intro">
     <h1>Ways into O'Keeffe's work</h1>
     <div class="intro-side">
-      <p class="lede">Prototypes from the Digital Experience team at the Georgia O'Keeffe Museum that turn collection and catalogue raisonné data into things you can explore, from maps and timelines to works shown at their true size. Each is built in p5.js, a creative coding tool, with the help of generative AI. Try any of them, then tell us what you think.</p>
+      <p class="lede">Prototypes from the Digital Experience team at the Georgia O'Keeffe Museum that turn collection data into things you can explore, from maps and timelines to works shown at their true size. Each is built in p5.js, a creative coding tool made for artists, with the help of generative AI. Try any of them, then tell us what you think.</p>
       <div class="acts">
         <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdsjmbq0M56niYfdl4N5c52cS8dOA0HCDvSLCFJTwfPspdQbg/viewform?usp=publish-editor" target="_blank" rel="noopener">Share your feedback</a>
         <a class="link" href="#prototypes">See the prototypes</a>
@@ -185,7 +186,7 @@ h1 { margin: 0; font-weight: 800; font-size: clamp(44px, 7.4vw, 96px); line-heig
       </a>
       <div class="label">
         <h3><a href="https://ok-scale-prototype.netlify.app/" target="_blank" rel="noopener">O'Keeffe to Scale</a></h3>
-        <p class="tomb"><span>Scale drawing, 2026</span><span>O'Keeffe paintings, watercolors, pastels, and drawings in the catalogue raisonné</span><span>2,024 works</span></p>
+        <p class="tomb"><span>Scale drawing, 2026</span><span>Every dated painting, watercolor, pastel, and drawing in the catalogue raisonné</span><span>2,024 works</span></p>
         <p class="desc">Each work drawn as an outline at its true size, beside a silhouette of O'Keeffe at 5 feet 5 inches. Play through her career year by year, or compare subjects side by side.</p>
         <div class="acts">
           <a class="btn" href="https://ok-scale-prototype.netlify.app/" target="_blank" rel="noopener">Open prototype</a>
@@ -215,13 +216,13 @@ h1 { margin: 0; font-weight: 800; font-size: clamp(44px, 7.4vw, 96px); line-heig
       <div class="label">
         <h3><a href="https://ok-subjects-prototype.netlify.app/" target="_blank" rel="noopener">O'Keeffe's Subjects</a></h3>
         <p class="tomb"><span>Bubble chart, 2026</span><span>Works grouped by subject</span></p>
-        <p class="desc">From landscapes and flowers to bones, buildings, and abstractions. Click a bubble to break it apart into smaller subjects, down to the individual works. This work is based on prototypes sketched with Design for Context in 2023.</p>
+        <p class="desc">From landscapes and flowers to bones, buildings, and abstractions. Click a bubble to break it apart into smaller subjects, down to the individual works.</p>
         <div class="acts">
           <a class="btn" href="https://ok-subjects-prototype.netlify.app/" target="_blank" rel="noopener">Open prototype</a>
         </div>
       </div>
     </article>
-    <article class="work half">
+    <article class="work wide">
       <a class="field f-hill" href="https://gok-in-context-prototype.netlify.app/" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
         <svg viewBox="0 0 320 180" aria-hidden="true" focusable="false">
           <line x1="28" y1="104" x2="292" y2="104" class="s-ink3" stroke-width="1.2"/>
@@ -253,7 +254,7 @@ h1 { margin: 0; font-weight: 800; font-size: clamp(44px, 7.4vw, 96px); line-heig
         </div>
       </div>
     </article>
-    <article class="work half">
+    <article class="work wide">
       <a class="field f-petal" href="https://eye-for-okeeffe-prototype.netlify.app/" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
         <svg viewBox="0 0 320 180" aria-hidden="true" focusable="false">
           <g class="f-none s-rule" stroke-width="1.2"><circle cx="232" cy="22" r="4"/><circle cx="246" cy="22" r="4"/><circle cx="260" cy="22" r="4"/></g>
@@ -275,9 +276,39 @@ h1 { margin: 0; font-weight: 800; font-size: clamp(44px, 7.4vw, 96px); line-heig
       <div class="label">
         <h3><a href="https://eye-for-okeeffe-prototype.netlify.app/" target="_blank" rel="noopener">Eye for O'Keeffe</a></h3>
         <p class="tomb"><span>Quiz, 2026</span><span>Five rounds</span></p>
-        <p class="desc">How well do you read an O'Keeffe? Decide whether two of her works have similar compositions, then see how a computer reads them. This is based on a prototype by Jonathan Lee of NMHU.</p>
+        <p class="desc">How well do you read an O'Keeffe? Decide whether two of her works have similar compositions, then see how a computer reads them.</p>
         <div class="acts">
           <a class="btn" href="https://eye-for-okeeffe-prototype.netlify.app/" target="_blank" rel="noopener">Open prototype</a>
+        </div>
+      </div>
+    </article>
+    <article class="work wide">
+      <a class="field f-adobe" href="https://ok-curate-prototype.netlify.app/" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+        <svg viewBox="0 0 320 180" aria-hidden="true" focusable="false">
+          <line x1="20" y1="150" x2="300" y2="150" class="s-ink3" stroke-width="1.2"/>
+          <line x1="20" y1="154" x2="300" y2="154" class="s-rule"/>
+          <line x1="92" y1="86" x2="300" y2="86" class="s-rule" stroke-dasharray="3 4"/>
+          <text x="92" y="81" class="t-mono">60 in</text>
+          <rect x="26" y="72" width="50" height="8" class="f-ink2"/>
+          <rect x="26" y="86" width="44" height="2.5" class="f-ink3" opacity=".7"/>
+          <rect x="26" y="92" width="48" height="2.5" class="f-ink3" opacity=".7"/>
+          <rect x="26" y="98" width="32" height="2.5" class="f-ink3" opacity=".7"/>
+          <rect x="128" y="58" width="46" height="56" class="f-paper s-ink3" stroke-width="1.2"/>
+          <rect x="177" y="108" width="6" height="4" class="f-paper s-rule"/>
+          <g class="spin">
+            <rect x="192" y="72" width="38" height="28" class="f-paper s-g" stroke-width="1.6"/>
+            <rect x="233" y="94" width="6" height="4" class="f-paper s-rule"/>
+          </g>
+          <rect x="246" y="46" width="40" height="80" class="f-paper s-ink3" stroke-width="1.2"/>
+          <rect x="289" y="120" width="6" height="4" class="f-paper s-rule"/>
+        </svg>
+      </a>
+      <div class="label">
+        <h3><a href="https://ok-curate-prototype.netlify.app/" target="_blank" rel="noopener">Curate Your Own Gallery</a></h3>
+        <p class="tomb"><span>Exhibition builder, 2026</span><span>1,251 works to choose from</span><span>Hung at their true size</span></p>
+        <p class="desc">Choose works by color or subject, paint the wall, and write your own title wall. Hang them at eye level or salon style, rearrange them, and save your exhibition as an image.</p>
+        <div class="acts">
+          <a class="btn" href="https://ok-curate-prototype.netlify.app/" target="_blank" rel="noopener">Open prototype</a>
         </div>
       </div>
     </article>
@@ -289,6 +320,12 @@ h1 { margin: 0; font-weight: 800; font-size: clamp(44px, 7.4vw, 96px); line-heig
       <p>Your feedback shapes where these experiments go next. You don't need to try every prototype before you respond.</p>
       <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdsjmbq0M56niYfdl4N5c52cS8dOA0HCDvSLCFJTwfPspdQbg/viewform?usp=publish-editor" target="_blank" rel="noopener">Open the feedback form</a>
     </div>
+    <ul class="asks" aria-label="Things we'd love to hear about">
+      <li>Which prototype you spent the most time with, and why</li>
+      <li>Anything that was confusing, slow, or didn't work on your device</li>
+      <li>Something you learned about O'Keeffe or her work that surprised you</li>
+      <li>What you'd want to see next, or how you might use one of these</li>
+    </ul>
   </section>
 
   <p class="fine">O'Keeffe Experiments is from the Digital Experience team at the Georgia O'Keeffe Museum. These prototypes use data and images from <em>Access O'Keeffe</em>, including the catalogue raisonné, along with some subject information added with the help of AI. Because these are prototypes, the data and images have not been reviewed for publication in this format.</p>
