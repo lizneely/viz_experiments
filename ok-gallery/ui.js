@@ -89,7 +89,7 @@ function buildFilters() {
   $("#active-filters").addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
     if (b.dataset.clear === "color") F.color = null;
-    if (b.dataset.clear === "subject") F.subject = null;
+    if (b.dataset.clear === "subject") { F.subject = null; resetSubjectBubbles(); }
     renderResults();
   });
 }
@@ -97,13 +97,13 @@ function buildFilters() {
 function filteredWorks() {
   let list = WORKS;
   if (F.color) { const set = new Set(F.color.works.map(w => w.id)); list = list.filter(w => set.has(w.id)); }
-  if (F.subject) list = list.filter(w => w.subject === F.subject.name);
+  if (F.subject) list = list.filter(w => F.subject.ids.has(w.id));
   return list;
 }
 
 function renderResults() {
   document.querySelectorAll(".swatch").forEach(b => b.setAttribute("aria-pressed", COLOR_LIST[+b.dataset.i] === F.color ? "true" : "false"));
-  renderSubjectBubbles();
+  if (F.color !== SB.lastColor) { SB.lastColor = F.color; renderSubjectBubbles(); } else if (SB.ready) subjDom();
 
   const list = filteredWorks();
   const chips = [];
@@ -175,6 +175,7 @@ function buildWallControls() {
     if (resetArmed) {
       disarm();
       F.color = null; F.subject = null; F.shown = RESULTS_PAGE;
+      resetSubjectBubbles();
       $("#results").scrollTop = 0;
       $("#share-text").hidden = true;
       wallStartOver();
@@ -374,6 +375,7 @@ function onSketchReady() {
     const fromLink = loadStateFromLink();
     if (!fromLink) loadState();
     buildFilters();
+    initSubjectBubbles();
     buildShare();
     buildWallControls();
     syncWallControls();
