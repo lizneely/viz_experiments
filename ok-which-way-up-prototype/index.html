@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Which Way Is Up?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="lab"><div class="wrap lab-in">
+  <span class="lab-name">O'Keeffe Experiments</span>
+  <span class="lab-note">The following prototype is for experimental purposes and is using information that has not been reviewed.</span>
+  <a class="lab-link" href="https://okeeffe-experiments.netlify.app/" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="1" width="6" height="6" fill="currentColor"/><rect x="9" y="1" width="6" height="6" fill="currentColor"/><rect x="1" y="9" width="6" height="6" fill="currentColor"/><rect x="9" y="9" width="6" height="6" fill="currentColor"/></svg><span>All prototypes</span></a>
+</div></div>
+
+<main class="wrap">
+  <section class="intro">
+    <h1>Which Way Is Up?</h1>
+    <p class="lede">Some of O'Keeffe's works have hung sideways, or even upside down. Museums, publishers, and O'Keeffe's own records don't always agree on which way is up. Turn each work until it looks right to you, hang it, and see who agrees with you.</p>
+  </section>
+
+  <section class="game" id="game">
+    <div>
+      <div class="wall" id="wall">
+        <svg class="wire" id="wire" aria-hidden="true"><line id="w1"/><line id="w2"/><circle id="nail" r="3.5"/></svg>
+        <img id="art" alt="" draggable="false">
+        <span class="tag" id="walltag"></span>
+        <p class="loading" id="loading">Fetching the work…</p>
+      </div>
+      <div class="controls" id="turnControls">
+        <button class="btn" id="left" type="button" aria-label="Turn a quarter to the left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4v6h6"/><path d="M4.5 10A8 8 0 1 1 6 16.5"/></svg>Turn left</button>
+        <button class="btn" id="right" type="button" aria-label="Turn a quarter to the right">Turn right<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 4v6h-6"/><path d="M19.5 10A8 8 0 1 0 18 16.5"/></svg></button>
+        <span class="grow"></span>
+        <button class="btn primary" id="hang" type="button">Hang it</button>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="progress"><div class="dots" id="dots"></div><span id="count"></span></div>
+      <div class="prompt" id="prompt">
+        <h2>Which way is up?</h2>
+        <p>This work has been turned. Rotate it a quarter turn at a time until it feels right, then hang it. Titles stay hidden until you decide.</p>
+        <p class="hint" style="margin-top:8px">Each game includes two works whose orientation has been disputed.</p>
+      </div>
+      <div id="reveal" hidden>
+        <div class="verdict" id="verdict"></div>
+        <div class="label" id="label"></div>
+        <div class="ledger">
+          <h3 id="ledgerTitle">Ways it has been hung</h3>
+          <ol id="ledger"></ol>
+          <p class="hint" style="margin:8px 0 0">Select a row to turn the work that way.</p>
+        </div>
+        <div class="controls"><button class="btn primary" id="next" type="button">Next work</button></div>
+      </div>
+      <p class="sr" aria-live="polite" id="live"></p>
+    </div>
+  </section>
+
+  <section class="results" id="results" hidden></section>
+</main>
+
+<footer><div class="wrap">
+  <p class="fine">O'Keeffe Experiments is from the Digital Experience team at the Georgia O'Keeffe Museum. These prototypes use data and images from <em>Access O'Keeffe</em>, including the catalogue raisonné, along with some subject information added with the help of AI. Because these are prototypes, the data and images have not been reviewed for publication in this format.</p>
+  <p class="credit">Orientation notes come from the catalogue raisonné records in <em>Access O'Keeffe</em>. Notes marked "published accounts" come from outside the Museum's records.</p>
+  <a class="btn primary" href="https://docs.google.com/forms/d/e/1FAIpQLSdsjmbq0M56niYfdl4N5c52cS8dOA0HCDvSLCFJTwfPspdQbg/viewform?usp=publish-editor" target="_blank" rel="noopener">Share your feedback</a>
+</div></footer>
+
+<script src="disputes.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
