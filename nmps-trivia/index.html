@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Museum Publishing Pursuit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single proof sheet with crop marks; the six-wedge pie is the scoreboard, the question card is the page being proofed. */
+:root {
+  --paper: #f3f5f2;
+  --sheet: #ffffff;
+  --ink: #1b2230;
+  --ink-soft: #566070;
+  --rule: #d5dbd6;
+  --mark: #9aa3ad;
+  --accent: #2c5fb3;
+  --right: #23854f;
+  --wrong: #c2413a;
+  --c-where: #2c6bc1;
+  --c-bits: #2e9a63;
+  --c-fine: #e07a1f;
+  --c-ink: #8a5a2b;
+  --c-voices: #d2457d;
+  --c-fame: #d9a90f;
+  --empty: #e6eae6;
+  --f-display: "Young Serif", Georgia, "Times New Roman", serif;
+  --f-body: "Figtree", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #10141c; --sheet: #181e29; --ink: #e9ecef; --ink-soft: #a3acb8; --rule: #2c3442; --mark: #5d6776;
+    --accent: #7aa7ee; --right: #4cc287; --wrong: #ef6f66;
+    --c-where: #5b91e0; --c-bits: #4bbd84; --c-fine: #f0954a; --c-ink: #c08a57; --c-voices: #e8719f; --c-fame: #e9c247;
+    --empty: #262e3b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #10141c; --sheet: #181e29; --ink: #e9ecef; --ink-soft: #a3acb8; --rule: #2c3442; --mark: #5d6776;
+  --accent: #7aa7ee; --right: #4cc287; --wrong: #ef6f66;
+  --c-where: #5b91e0; --c-bits: #4bbd84; --c-fine: #f0954a; --c-ink: #c08a57; --c-voices: #e8719f; --c-fame: #e9c247;
+  --empty: #262e3b; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 40px;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: grid; gap: 22px; }
+
+header { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 6px; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(28px, 6vw, 44px); line-height: 1.08; margin: 0; text-wrap: balance; }
+.sub { margin: 10px 0 0; color: var(--ink-soft); max-width: 46ch; }
+.pie-box { display: grid; justify-items: center; gap: 6px; }
+.pie-box svg { width: 112px; height: 112px; display: block; }
+.pie-label { font-family: var(--f-mono); font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 0; padding: 0; list-style: none; font-size: 13px; color: var(--ink-soft); }
+.legend li { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+.legend li.got { color: var(--ink); font-weight: 600; }
+
+/* the proof sheet with crop marks */
+.sheet { position: relative; background: var(--sheet); border: 1px solid var(--rule); padding: clamp(20px, 4vw, 36px); }
+.crop { position: absolute; width: 18px; height: 18px; border-color: var(--mark); border-style: solid; border-width: 0; }
+.crop.tl { top: -10px; left: -10px; border-top-width: 1px; border-left-width: 1px; }
+.crop.tr { top: -10px; right: -10px; border-top-width: 1px; border-right-width: 1px; }
+.crop.bl { bottom: -10px; left: -10px; border-bottom-width: 1px; border-left-width: 1px; }
+.crop.br { bottom: -10px; right: -10px; border-bottom-width: 1px; border-right-width: 1px; }
+
+.meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; font-family: var(--f-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding: 5px 10px 5px 8px; border: 1px solid var(--rule); border-radius: 999px; }
+.progress { display: flex; gap: 6px; align-items: center; font-family: var(--f-mono); font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.pips { display: flex; gap: 4px; }
+.pip { width: 18px; height: 4px; background: var(--empty); }
+.pip.ok { background: var(--right); } .pip.no { background: var(--wrong); } .pip.now { background: var(--ink-soft); }
+
+.question { font-family: var(--f-display); font-size: clamp(21px, 3.6vw, 27px); line-height: 1.28; margin: 0 0 20px; text-wrap: balance; }
+.opts { display: grid; gap: 10px; }
+.opts.tf { grid-template-columns: 1fr 1fr; }
+.opt {
+  font: inherit; text-align: left; color: var(--ink); background: transparent; border: 1px solid var(--rule); padding: 13px 16px;
+  cursor: pointer; display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: baseline; transition: border-color .15s, background .15s;
+}
+.opt:hover:not(:disabled) { border-color: var(--ink-soft); }
+.opt:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.opt .key { font-family: var(--f-mono); font-size: 13px; color: var(--ink-soft); }
+.opt:disabled { cursor: default; }
+.opt.correct { border-color: var(--right); background: color-mix(in srgb, var(--right) 10%, transparent); }
+.opt.picked-wrong { border-color: var(--wrong); background: color-mix(in srgb, var(--wrong) 9%, transparent); }
+.opt.dim { opacity: .55; }
+
+.reveal { margin-top: 20px; padding-top: 18px; border-top: 1px dashed var(--rule); display: grid; gap: 8px; }
+.verdict { font-weight: 700; font-size: 17px; margin: 0; }
+.verdict.ok { color: var(--right); } .verdict.no { color: var(--wrong); }
+.bg-label { font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); margin: 0; }
+.bg { margin: 0; max-width: 65ch; }
+.actions { display: flex; justify-content: flex-end; margin-top: 18px; gap: 10px; flex-wrap: wrap; }
+.btn { font: inherit; font-weight: 600; border: 1px solid var(--ink); background: var(--ink); color: var(--sheet); padding: 11px 20px; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
+.btn:hover { filter: brightness(1.08); }
+
+/* results */
+.result { display: grid; gap: 14px; }
+.score { font-family: var(--f-display); font-size: clamp(48px, 12vw, 84px); line-height: 1; margin: 0; font-variant-numeric: tabular-nums; }
+.score small { font-size: .4em; color: var(--ink-soft); }
+.quip { font-family: var(--f-display); font-size: clamp(20px, 3.6vw, 26px); margin: 0; text-wrap: balance; }
+.quip-sub { margin: 0; color: var(--ink-soft); }
+.tally { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; }
+.tally li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: baseline; font-size: 15px; }
+.tally .mk { font-family: var(--f-mono); font-weight: 500; }
+.tally .mk.ok { color: var(--right); } .tally .mk.no { color: var(--wrong); }
+.tally .cat { font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); display: block; }
+
+footer { font-family: var(--f-mono); font-size: 12px; color: var(--ink-soft); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+footer button { font: inherit; background: none; border: 0; color: var(--ink-soft); text-decoration: underline; cursor: pointer; padding: 0; }
+
+@media (max-width: 520px) {
+  header { grid-template-columns: 1fr; }
+  .pie-box { justify-items: start; grid-auto-flow: column; align-items: center; justify-content: start; gap: 12px; }
+  .pie-box svg { width: 84px; height: 84px; }
+  .opts.tf { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+@keyframes pop { from { transform: scale(.6); opacity: .3; } to { transform: scale(1); opacity: 1; } }
+.wedge.new { animation: pop .45s ease-out; transform-origin: 60px 60px; }
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow">National Museum Publishing Seminar · 1989–2025</p>
+      <h1>How well do you know museum publishing?</h1>
+      <p class="sub">Five questions a round, drawn from 22 seminar programs. Answer one right in a category to win its wedge. Fill the pie to win.</p>
+    </div>
+    <div class="pie-box" aria-live="polite">
+      <svg id="pie" viewBox="0 0 120 120" role="img" aria-label="Wedges earned"></svg>
+      <span class="pie-label" id="pieLabel">0 of 6 wedges</span>
+    </div>
+  </header>
+
+  <ul class="legend" id="legend"></ul>
+
+  <section class="sheet" id="sheet" aria-live="polite">
+    <span class="crop tl"></span><span class="crop tr"></span><span class="crop bl"></span><span class="crop br"></span>
+    <div id="stage"></div>
+  </section>
+
+  <footer>
+    <span>Source: NMPS program archive, 22 programs, 922 presenter appearances</span>
+    <button type="button" id="resetBtn">Reset pie</button>
+  </footer>
+</div>
+
+<script>
+const QUESTIONS = [{"cat": "where", "q": "Which city has hosted the National Museum Publishing Seminar most often?", "opts": ["Chicago", "Washington, D.C.", "Philadelphia", "Pasadena"], "a": 0, "bg": "Chicago has hosted seven times: 1993, 1996, 2002, 2008, 2012, 2016, and 2023. Washington, Philadelphia, and Pasadena have two apiece. For years the seminar was cosponsored by the University of Chicago's publishing program."}, {"cat": "where", "q": "The 2000 seminar is the only one held outside the United States. Where did it meet?", "opts": ["Ottawa", "Toronto", "Montreal", "Vancouver"], "a": 0, "bg": "Ottawa's edition was billed as the \"9th International Museum Publishing Seminar,\" offered simultaneous translation in English and French, and held two days of sessions across the river at the Canadian Museum of Civilization (now the Canadian Museum of History)."}, {"cat": "where", "q": "Before it was NMPS, the seminar began in 1989 as part of a series run by which organization?", "opts": ["Society for Scholarly Publishing", "American Alliance of Museums", "College Art Association", "Association of University Presses"], "a": 0, "bg": "The first three seminars (Milwaukee 1989, Philadelphia 1990, and Houston 1991) were Society for Scholarly Publishing events. Starting in 1993, the programs list museums and the University of Chicago as cosponsors."}, {"cat": "where", "type": "tf", "q": "True or false: NMPS has met every other year since it began.", "opts": ["True", "False"], "a": 1, "bg": "False. It met nearly every year at first (1989 to 1996, skipping 1992), settled into an every-other-year rhythm in 1998, and the pandemic produced back-to-back virtual editions in 2020 and 2021."}, {"cat": "where", "q": "Which month has opened the most seminars?", "opts": ["June", "May", "April", "September"], "a": 0, "bg": "Six seminars opened in June: 2006, 2008, 2010, 2012, 2014, and 2025. May and April have four each. The earliest seminars met in the fall and even December."}, {"cat": "where", "q": "When the 2020 seminar moved online, what was it called?", "opts": ["Museum Publishing Now", "NMPS Live", "Publishing Apart", "The Distanced Desk"], "a": 0, "bg": "\"Museum Publishing Now: 2020\" ran as a series of virtual sessions from July 9 to August 12. The 2021 seminar was also virtual, spread across six weeks."}, {"cat": "where", "q": "The very first welcome reception, in Milwaukee in 1989, took place inside what kind of museum exhibit?", "opts": ["A walk-through rain forest", "A dinosaur hall", "A historic street of shops", "A planetarium dome"], "a": 0, "bg": "Guests mingled in the Milwaukee Public Museum's \"Rain Forest: Exploring Life on Earth,\" a 12,000-square-foot exhibit with a waterfall and five video theaters."}, {"cat": "where", "q": "Chicago attendees in 1996 and 2002 spent their Thursday evening at which institution?", "opts": ["John G. Shedd Aquarium", "Field Museum", "Adler Planetarium", "Lincoln Park Zoo"], "a": 0, "bg": "Both evenings were at the Shedd. The 1996 dinner included \"presentations with the animals,\" and the 2002 program lists a marine mammal presentation right after the keynote."}, {"cat": "where", "type": "tf", "q": "True or false: The 2014 Boston seminar bused attendees to Salem for its evening reception.", "opts": ["True", "False"], "a": 0, "bg": "True. The reception was at the Peabody Essex Museum in Salem, Massachusetts. An optional tour of the Museum of Fine Arts, Boston, followed on Sunday."}, {"cat": "where", "q": "How many seminar programs, from 1989 to 2025, are in the NMPS archive?", "opts": ["22", "18", "25", "30"], "a": 0, "bg": "Twenty-two programs hold 602 schedule items, 374 of them program sessions. The rest are registration, meals, breaks, and bus rides."}, {"cat": "bits", "q": "In what year did the word \"Internet\" first appear in an NMPS session title?", "opts": ["1996", "1993", "2000", "2002"], "a": 0, "bg": "The 1996 Chicago seminar had two: \"The Hitchhiker's Guide to the Internet\" and \"Copyright Law and the Internet.\" The 1998 sequel was \"Back to the Internet: What's Hot, What's Not.\""}, {"cat": "bits", "q": "In 2014, NMPS tried its first rapid-fire session. What format was it?", "opts": ["Pecha Kucha", "Ignite", "Unconference", "TED-style talks"], "a": 0, "bg": "Five case studies, 20 slides each, 20 seconds per slide. The format returned in 2016 and has been called a Lightning Round since 2018."}, {"cat": "bits", "q": "Which Getty initiative, presented at NMPS in 2010, set out to create replicable models for online collection catalogues?", "opts": ["OSCI", "IIIF", "DAMS", "OCLC"], "a": 0, "bg": "The Online Scholarly Catalogue Initiative launched in 2008 with nine museums. It got two sessions in 2010 and a follow-up, \"OSCI Revisited,\" in 2012."}, {"cat": "bits", "q": "Which open-source publishing tool was first demonstrated at a 2018 preconference session?", "opts": ["Quire", "Scalar", "Omeka", "Pressbooks"], "a": 0, "bg": "Getty's Quire had a demo in 2018, a community meetup in 2023, and a hands-on workshop in Baltimore in 2025."}, {"cat": "bits", "type": "tf", "q": "True or false: Every seminar since 1993 has had at least one session on electronic or digital publishing.", "opts": ["True", "False"], "a": 0, "bg": "True. From \"The Status of Electronic Publishing\" (1993) to AI-assisted image descriptions (2025), digital is the archive's most common topic: about one session in five, peaking at 45 percent from 2010 to 2016."}, {"cat": "bits", "q": "Finish the 2012 session title: \"With a Name Like ____, It Has to Be Good.\"", "opts": ["Twitter", "Facebook", "Google", "Kindle"], "a": 0, "bg": "The session covered social media, blogs, and selling books. Social media got its own session again in 2025, \"Social Media for Museum Publishers.\""}, {"cat": "bits", "q": "Which technology first appeared in an NMPS session title in 2025?", "opts": ["AI", "Virtual reality", "Blockchain", "QR codes"], "a": 0, "bg": "\"Leveraging AI to Enhance Image Descriptions for Art Collections\" looked at generative AI for alt text, so that collections are more accessible to visitors who are blind or have low vision."}, {"cat": "bits", "q": "A 2014 session noted it had been six years since the Kindle and only four since what?", "opts": ["The first iPad", "The first iPhone", "Google Books", "EPUB"], "a": 0, "bg": "\"Digital Publishing 101: The Complete Picture from EPUB to App\" covered EPUB and MOBI e-books, enhanced books, tablet apps, and HTML5 web books."}, {"cat": "bits", "type": "tf", "q": "True or false: The 1994 Washington seminar included a field trip to see interactive information technology at the Library of Congress.", "opts": ["True", "False"], "a": 0, "bg": "True. Attendees visited the National Demonstration Laboratory for Interactive Information Technology. It was offered twice that year."}, {"cat": "fine", "type": "tf", "q": "True or false: Every seminar program has included a session on rights or legal issues.", "opts": ["True", "False"], "a": 1, "bg": "Close, but false. Rights, permissions, contracts, or copyright show up in 19 of 22 programs. The exceptions are 2010, 2012, and 2025."}, {"cat": "fine", "q": "Which topic has not had a session of its own since 2014?", "opts": ["Budgets and finances", "Copyright", "Book design", "Collection catalogues"], "a": 0, "bg": "Budgets and fundraising had about one session in eight in the first decade, with titles like \"Show Me the Money\" and \"Yes, Virginia, You Can Raise Money for Books.\" The last was \"Money and Mission\" in 2014. Today budgets are taught in the preconference Museum Publishing 101."}, {"cat": "fine", "q": "The 1990 session \"Shall We Dance?\" was about negotiating what?", "opts": ["Contracts", "Translations", "Printing bids", "Speaker fees"], "a": 0, "bg": "Its full title was \"Shall We Dance? Negotiating Contracts.\" Contract negotiation came back in 1991, 2002, and the 2018 \"Legal Boot Camp.\""}, {"cat": "fine", "q": "The 2000 session \"From Grants to Golf\" covered what?", "opts": ["Fundraising techniques and partnerships", "Staff retreats", "Sports museum publishing", "Marketing to retirees"], "a": 0, "bg": "Its subtitle was \"Fundraising Techniques and Partnerships.\" Fundraising for books was a steady theme of the 1990s."}, {"cat": "fine", "q": "Finish the 2012 session title: \"Are You There, Publisher? It's Me, the ____.\"", "opts": ["Museum", "Curator", "Author", "Archive"], "a": 0, "bg": "The panel explained the difference between copublishing and distribution and how to approach a publisher, with speakers from two university presses."}, {"cat": "fine", "type": "tf", "q": "True or false: \"Fair use\" appeared in a session title before 2010.", "opts": ["True", "False"], "a": 1, "bg": "False. Fair use came up in a 2008 session description, but it first appears in a title in 2018 (\"Legal Boot Camp: Copyright, Fair Use, and Contracts\") and got a full session in 2021."}, {"cat": "fine", "q": "A 2006 session covered opportunities for museum publishers with which two services?", "opts": ["JSTOR and Lightning Source", "Amazon and Google Books", "Flickr and YouTube", "Kindle and iBooks"], "a": 0, "bg": "JSTOR, the digital library, and Lightning Source, the print-on-demand printer, were both new routes to readers. In this archive, \"Lightning\" meant a printer long before it meant a session format."}, {"cat": "fine", "q": "Which business topic has the most sessions in the archive?", "opts": ["Marketing, sales, and retail", "Budgets and finance", "Copublishing and distribution", "Rights and contracts"], "a": 0, "bg": "Marketing, sales, and the museum store account for 27 sessions, from \"Marketing Museum Publications\" (1989) to \"Getting on the Radar\" (2021). Rights and legal have 22, budgets 20, and copublishing 18."}, {"cat": "ink", "q": "The 1991 session \"Green Sky, Brown Clouds\" was about what?", "opts": ["Color accuracy in transparencies and separations", "Recycled paper", "Landscape painting catalogues", "Storm damage to archives"], "a": 0, "bg": "The subtitle was \"Accuracy in Transparencies and Separations,\" a prepress problem for any art publisher. Image quality came back in 2025 with \"The Life Cycle of Great Images.\""}, {"cat": "ink", "q": "Which kind of book had sessions of its own in 1993, 1995, 1996, 2002, and 2010, but none since?", "opts": ["Children's books", "Annual reports", "Collection catalogues", "Exhibition catalogues"], "a": 0, "bg": "Sessions ranged from \"Developing Children's Books\" (1993) and \"Connect with Kids!\" (1995) to \"A New Look at Children's Books\" (2010). Since then, children's books have come up only in a 2016 Pecha Kucha talk."}, {"cat": "ink", "q": "In 1998, NMPS asked whether collection catalogues were essential publications or museum what?", "opts": ["Dinosaurs", "Dodos", "Relics", "Mausoleums"], "a": 0, "bg": "\"Collection Catalogues: Museum Dinosaurs or Essential Publications?\" The debate went on through the OSCI digital catalogues (2010 to 2012) and \"Demystifying Digital Catalogue Decisions\" (2023)."}, {"cat": "ink", "type": "tf", "q": "True or false: Sustainability came up at NMPS before 2000.", "opts": ["True", "False"], "a": 0, "bg": "True. The 1993 seminar had \"Archival and Ecological Issues in Museum Publishing.\" It returned with \"Get Your Green On\" (2008) and \"Green New Deal\" (2020)."}, {"cat": "ink", "q": "The 2008 session \"Get Your Green On\" began: \"Green is the new ____.\"", "opts": ["black", "gold", "bestseller", "beige"], "a": 0, "bg": "The session went through paper and print certifications like FSC and SFI, under the heading \"FSC. SFI. PCRF. CoC. TMI*\" (*too much information)."}, {"cat": "ink", "q": "The 2025 \"Style Slam\" was a collaborative approach to what?", "opts": ["Creating a house style guide", "Judging book covers", "A poetry reading", "Choosing a typeface"], "a": 0, "bg": "Editors from the Smithsonian's National Museum of American History described how they built a house style guide together. Style sheets have had sessions since 1993."}, {"cat": "ink", "q": "The 2004 session \"Tango or Tangle?\" looked at which working relationship?", "opts": ["Curator and editor", "Designer and printer", "Author and agent", "Publisher and store"], "a": 0, "bg": "It's a recurring theme: \"Author versus Editor\" (1993), \"Tango or Tangle?\" (2004), and \"Love at First Write\" (2008)."}, {"cat": "ink", "q": "The longest session title in the archive (130 characters) begins with which question?", "opts": ["\"Are Jackets Required?\"", "\"Does Quality Matter?\"", "\"Is It Publishable?\"", "\"Why Publish?\""], "a": 0, "bg": "In full: \"Are Jackets Required? Rethinking Museum Publications in the Face of New Technology, Increasing Expectations, and Shrinking Budgets\" (2012). All four options are real NMPS titles."}, {"cat": "ink", "type": "tf", "q": "True or false: \"Managing Ephemera\" has been the title of sessions at two different seminars.", "opts": ["True", "False"], "a": 0, "bg": "True, in 1993 and 2006. Other repeated titles include \"Marketing Museum Publications\" (1989 and 1993) and \"Museum Publishing 101\" (2018 and 2021)."}, {"cat": "voices", "q": "A 2016 session cited a Mellon Foundation survey. What share of museum jobs tied to intellectual and educational missions were held by non-Hispanic white staff?", "opts": ["84 percent", "62 percent", "71 percent", "93 percent"], "a": 0, "bg": "The 2015 survey covered 278 museums. The panel, \"Museums and Equality: Inside and Out,\" asked what is published and who publishes it."}, {"cat": "voices", "q": "Which topic grew from about 4 percent of sessions in earlier decades to about 19 percent since 2018?", "opts": ["Equity, access, and inclusion", "Budgets and finance", "Magazines and ephemera", "Children's books"], "a": 0, "bg": "Recent sessions include inclusive language (2020 and 2021), \"A Is for Access\" (2021), language justice (2023), and equity \"on Both Sides of the Editorial Desk\" (2025)."}, {"cat": "voices", "q": "In what year did inclusive language first get its own session?", "opts": ["2020", "2008", "2016", "2023"], "a": 0, "bg": "The 2020 \"Inclusive Language Roundtable Discussion\" was followed in 2021 by \"Inclusive Language: How and Where to Start,\" because many institutions said in 2020 that they were drafting guidance."}, {"cat": "voices", "q": "A 1996 session called museums \"the New Towers of Babel.\" What was it about?", "opts": ["Multilanguage labels and translation", "Skyscraper museum buildings", "Online discussion forums", "Museum politics"], "a": 0, "bg": "Translation keeps coming back: in 2000, \"Lost in Translation\" (2018), \"Why Translate?\" (2023), and \"Buenas intenciones, Myriad Challenges\" (2025)."}, {"cat": "voices", "q": "A 2016 label session quoted a 1963 essay calling many labels \"veritable masterpieces of ____.\"", "opts": ["cryptography", "brevity", "bureaucracy", "poetry"], "a": 0, "bg": "The essay was \"Why Johnny Can't Read Labels.\" The session, \"Beyond the Wall,\" explored print and digital labels. Label writing has had sessions since 1993."}, {"cat": "voices", "type": "tf", "q": "True or false: The 2021 virtual seminar launched a mentorship network.", "opts": ["True", "False"], "a": 0, "bg": "True. The 2021 program opened sign-ups for mentors and mentees, and the 2023 seminar held two mentor meetups. 2021 also had speed networking and a BIPOC social hour."}, {"cat": "voices", "q": "The 1996 opening talk \"The Museum That Rock Built\" came from the director of which museum?", "opts": ["Rock and Roll Hall of Fame and Museum", "Experience Music Project", "Grammy Museum", "Smithsonian National Museum of American History"], "a": 0, "bg": "The Cleveland museum had opened the year before. Over the years the seminar has heard from zoos, aquariums, children's museums, and gardens as well as art museums."}, {"cat": "voices", "q": "Finish the 2018 session title: \"Didactics to ____.\"", "opts": ["Die For", "Live By", "Write Home About", "Remember"], "a": 0, "bg": "Labels and interpretation are one of the archive's biggest topics, with 31 sessions. They were most common from 2000 to 2016."}, {"cat": "fame", "q": "Who has presented at NMPS the most?", "opts": ["Susan F. Rossen", "Stephanie Medlock", "Kara Kirk", "Kathy Fredrickson"], "a": 0, "bg": "Susan F. Rossen, an NMPS cofounder from the Art Institute of Chicago, appears 26 times across 15 seminars, from 1989 to 2020. Stephanie Medlock is next with 15 appearances."}, {"cat": "fame", "q": "Which institution has supplied the most presenter appearances?", "opts": ["Art Institute of Chicago", "Metropolitan Museum of Art", "Getty Publications", "National Gallery of Art"], "a": 0, "bg": "The Art Institute of Chicago has 74 appearances by 32 people. Next are the Met with 45, Getty Publications with 31, and the National Gallery of Art with 28."}, {"cat": "fame", "type": "tf", "q": "True or false: The Art Institute of Chicago has had a presenter at every seminar.", "opts": ["True", "False"], "a": 1, "bg": "Nearly, but false. The Art Institute appears in 20 of 22 programs. The two exceptions are 2010 in Washington and the virtual 2021 seminar."}, {"cat": "fame", "q": "Which seminar had the most presenter appearances?", "opts": ["2021 (virtual)", "2012 (Chicago)", "2014 (Boston)", "1993 (Chicago)"], "a": 0, "bg": "The virtual 2021 seminar had 64 appearances, then 2012 with 59 and 2014 with 58. The first seminar, in 1989, had 11."}, {"cat": "fame", "q": "About how many different people have presented at NMPS?", "opts": ["About 630", "About 250", "About 400", "More than 1,000"], "a": 0, "bg": "There are 627 people across 922 appearances, from 346 institutions."}, {"cat": "fame", "q": "What's the most common role on an NMPS program?", "opts": ["Panelist", "Moderator", "Keynote speaker", "Solo speaker"], "a": 0, "bg": "Panelists make up 589 of 922 appearances, about 64 percent. Moderators are next at 17 percent. Rare roles include \"respondent\" (four times) and \"introducer\" (once)."}, {"cat": "fame", "type": "tf", "q": "True or false: Most NMPS presenters have presented only once.", "opts": ["True", "False"], "a": 0, "bg": "True. About 82 percent (514 of 627 people) appear once. A small group of regulars carries the institutional memory."}, {"cat": "fame", "q": "Which topic has the most sessions in the archive?", "opts": ["Digital and online publishing", "Editing and writing", "Marketing and sales", "Rights and legal"], "a": 0, "bg": "Digital and online publishing has 66 sessions. Next are career and program building with 46, then editing and audiences with 31 each."}];
+const CATS = {
+  where:  { name: "Where & When",      color: "--c-where" },
+  bits:   { name: "Bits & Bytes",      color: "--c-bits" },
+  fine:   { name: "Fine Print",        color: "--c-fine" },
+  ink:    { name: "Ink & Paper",       color: "--c-ink" },
+  voices: { name: "Visitors & Voices", color: "--c-voices" },
+  fame:   { name: "Hall of Fame",      color: "--c-fame" }
+};
+const ORDER = ["where", "bits", "fine", "ink", "voices", "fame"];
+const QUIPS = [
+  ["Still in manuscript.", "Grab an old program and try again."],
+  ["Remaindered, but there's always a reprint.", "One right is a start. The archive is patient."],
+  ["Back to the author.", "The peer reviewers have notes."],
+  ["Second proofs.", "A few queries in the margin, but the book is coming together."],
+  ["Press-ready.", "One stray widow, and nobody noticed."],
+  ["Colophon-worthy.", "You could chair the planning committee."]
+];
+
+QUESTIONS.forEach((q, i) => { q.id = i; });
+
+function load(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; } }
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+
+let state = {
+  wedges: load("nmps-wedges", []),
+  seen: load("nmps-seen", []),
+  round: null, idx: 0, answers: [], phase: "question", newWedges: []
+};
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+function newRound() {
+  // five different categories; ones not yet in the pie come first
+  const missing = shuffle(ORDER.filter((c) => !state.wedges.includes(c)));
+  const have = shuffle(ORDER.filter((c) => state.wedges.includes(c)));
+  const cats = missing.concat(have).slice(0, 5);
+  const round = cats.map((c) => {
+    let pool = QUESTIONS.filter((q) => q.cat === c && !state.seen.includes(q.id));
+    if (!pool.length) { state.seen = state.seen.filter((id) => QUESTIONS[id].cat !== c); pool = QUESTIONS.filter((q) => q.cat === c); }
+    const q = pool[Math.floor(Math.random() * pool.length)];
+    const order = q.type === "tf" ? q.opts.map((_, i) => i) : shuffle(q.opts.map((_, i) => i));
+    return { id: q.id, order };
+  });
+  state.round = shuffle(round);
+  state.idx = 0; state.answers = []; state.phase = "question"; state.newWedges = [];
+  render();
+}
+
+function pieSVG(highlight) {
+  const cx = 60, cy = 60, r = 54, gap = 0.035;
+  let out = `<circle cx="60" cy="60" r="58" fill="none" stroke="var(--rule)" stroke-width="1"/>`;
+  ORDER.forEach((c, i) => {
+    const a0 = (i / 6) * 2 * Math.PI - Math.PI / 2 + gap, a1 = ((i + 1) / 6) * 2 * Math.PI - Math.PI / 2 - gap;
+    const p = (a) => `${(cx + r * Math.cos(a)).toFixed(2)},${(cy + r * Math.sin(a)).toFixed(2)}`;
+    const got = state.wedges.includes(c);
+    const fill = got ? `var(${CATS[c].color})` : "var(--empty)";
+    const cls = highlight && highlight.includes(c) ? "wedge new" : "wedge";
+    out += `<path class="${cls}" d="M60,60 L${p(a0)} A${r},${r} 0 0 1 ${p(a1)} Z" fill="${fill}"><title>${esc(CATS[c].name)}${got ? " (earned)" : ""}</title></path>`;
+  });
+  out += `<circle cx="60" cy="60" r="9" fill="var(--sheet)" stroke="var(--rule)"/>`;
+  return out;
+}
+
+function renderChrome(highlight) {
+  $("pie").innerHTML = pieSVG(highlight);
+  const n = state.wedges.length;
+  $("pieLabel").textContent = n === 6 ? "Full pie!" : `${n} of 6 wedges`;
+  $("legend").innerHTML = ORDER.map((c) => `<li class="${state.wedges.includes(c) ? "got" : ""}"><span class="dot" style="background:var(${CATS[c].color})"></span>${esc(CATS[c].name)}</li>`).join("");
+}
+
+function render() {
+  renderChrome(state.phase === "done" ? state.newWedges : null);
+  const st = $("stage");
+  if (state.phase === "done") { st.innerHTML = resultsHTML(); $("again").focus(); $("again").onclick = newRound; return; }
+  const item = state.round[state.idx];
+  const q = QUESTIONS[item.id];
+  const cat = CATS[q.cat];
+  const answered = state.phase === "reveal";
+  const picked = answered ? state.answers[state.idx] : null;
+  const pips = state.round.map((_, i) => {
+    let cls = "pip";
+    if (i < state.answers.length) cls += state.answers[i] === QUESTIONS[state.round[i].id].a ? " ok" : " no";
+    else if (i === state.idx) cls += " now";
+    return `<span class="${cls}"></span>`;
+  }).join("");
+  const letters = q.type === "tf" ? ["T", "F"] : ["A", "B", "C", "D"];
+  const opts = item.order.map((oi, k) => {
+    let cls = "opt";
+    if (answered) {
+      if (oi === q.a) cls += " correct";
+      else if (oi === picked) cls += " picked-wrong";
+      else cls += " dim";
+    }
+    return `<button type="button" class="${cls}" data-i="${oi}" id="opt-${k}" ${answered ? "disabled" : ""}><span class="key">${letters[k]}</span><span>${esc(q.opts[oi])}</span></button>`;
+  }).join("");
+  const right = answered && picked === q.a;
+  st.innerHTML = `
+    <div class="meta">
+      <span class="chip"><span class="dot" style="background:var(${cat.color})"></span>${esc(cat.name)}</span>
+      <span class="progress"><span>Q${state.idx + 1}/5</span><span class="pips">${pips}</span></span>
+    </div>
+    <p class="question">${esc(q.q)}</p>
+    <div class="opts ${q.type === "tf" ? "tf" : ""}">${opts}</div>
+    ${answered ? `
+      <div class="reveal">
+        <p class="verdict ${right ? "ok" : "no"}">${right ? (state.wedges.includes(q.cat) && !state.newWedges.includes(q.cat) ? "Correct." : "Correct. " + esc(cat.name) + " wedge earned.") : "Not quite. The answer is " + esc(q.opts[q.a]) + "."}</p>
+        <p class="bg-label">From the archive</p>
+        <p class="bg">${esc(q.bg)}</p>
+      </div>
+      <div class="actions"><button type="button" class="btn" id="next">${state.idx === 4 ? "See my score" : "Next question"}</button></div>` : ""}
+  `;
+  if (!answered) st.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => answer(+b.dataset.i)));
+  else { $("next").addEventListener("click", next); $("next").focus(); }
+}
+
+function answer(i) {
+  const q = QUESTIONS[state.round[state.idx].id];
+  state.answers[state.idx] = i;
+  if (!state.seen.includes(q.id)) state.seen.push(q.id);
+  if (i === q.a && !state.wedges.includes(q.cat)) { state.wedges.push(q.cat); state.newWedges.push(q.cat); }
+  save("nmps-wedges", state.wedges); save("nmps-seen", state.seen);
+  state.phase = "reveal";
+  render();
+  renderChrome(i === q.a ? [q.cat] : null);
+}
+
+function next() {
+  if (state.idx < 4) { state.idx++; state.phase = "question"; render(); $("opt-0").focus(); }
+  else { state.phase = "done"; render(); }
+}
+
+function resultsHTML() {
+  const score = state.round.reduce((n, item, i) => n + (state.answers[i] === QUESTIONS[item.id].a ? 1 : 0), 0);
+  const [quip, sub] = QUIPS[score];
+  const full = state.wedges.length === 6;
+  const tally = state.round.map((item, i) => {
+    const q = QUESTIONS[item.id]; const ok = state.answers[i] === q.a;
+    return `<li><span class="mk ${ok ? "ok" : "no"}">${ok ? "✓" : "✕"}</span><span><span class="cat">${esc(CATS[q.cat].name)}</span>${esc(q.q)}</span></li>`;
+  }).join("");
+  const wedgeLine = state.newWedges.length
+    ? `New wedges: ${state.newWedges.map((c) => CATS[c].name).join(", ")}.`
+    : "No new wedges this round.";
+  return `
+    <div class="result">
+      <p class="bg-label">Round complete</p>
+      <p class="score">${score}<small> / 5</small></p>
+      <p class="quip">${esc(quip)}</p>
+      <p class="quip-sub">${esc(sub)} ${esc(wedgeLine)}</p>
+      ${full ? `<p class="verdict ok">Full pie. All six wedges. You know museum publishing.</p>` : ""}
+      <ul class="tally">${tally}</ul>
+      <div class="actions"><button type="button" class="btn" id="again">${full ? "Keep playing" : "Play another round"}</button></div>
+    </div>`;
+}
+
+$("resetBtn").addEventListener("click", () => { state.wedges = []; state.seen = []; save("nmps-wedges", []); save("nmps-seen", []); newRound(); });
+
+function start(data) {
+  if (data && data.round) Object.assign(state, data);
+  if (!state.round) newRound(); else render();
+}
+window.claude?.hot?.snapshot?.(() => ({ round: state.round, idx: state.idx, answers: state.answers, phase: state.phase, newWedges: state.newWedges, wedges: state.wedges, seen: state.seen }));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body>
+</html>
